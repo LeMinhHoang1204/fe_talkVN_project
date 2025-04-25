@@ -1,10 +1,10 @@
-import React from "react";
 import ChannelSidebar from "./pages/private/Home/LeftSideBar.tsx";
+import SideBar from "./pages/private/Home/SideBar.tsx";
 
 function MyApp() {
   return (
     <div className="flex">
-      <div className="w-[6%] bg-[#18092f]"> {/* group bar */}</div>
+      <div className="w-[6%] bg-[#18092f]"> {/* group bar */}  <SideBar /></div>
       <div className="w-[18%]">
           <ChannelSidebar />
       </div>
