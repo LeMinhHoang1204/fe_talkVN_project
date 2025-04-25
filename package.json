@@ -17,6 +17,7 @@
     "antd": "^5.22.2",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
+    "lucide-react": "^0.503.0",
     "notistack": "^3.0.1",
     "peer": "^1.0.2",
     "query-string": "^9.1.1",
