@@ -72,7 +72,6 @@ const SideBar: React.FC = () => {
     Tên Người Dùng
   </div> */}
 
-  {/* Menu dropdown hiển thị bên trái */}
   {isDropdownOpen && (
     <div className="absolute top-1/2 left-full -translate-y-[60%] ml-3 bg-[#2C2C2C] text-white border border-[#B5BAC1] rounded z-10 shadow-lg min-w-[140px]">
        <div className="px-4 py-2 text-xs text-[#F5F5F5] font-semibold border-b border-[#B5BAC1]">
