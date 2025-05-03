@@ -69,7 +69,10 @@ function LoginPage() {
           className="bg-white bg-opacity-80 rounded-[40px] p-10 shadow-2xl max-w-md w-full"
           style={{ width: "450px" }}
         >
-          <h1 className="text-4xl font-bold text-center text-[#3F2B6A] mb-8">
+          <h1
+            className="text-5xl font-bold text-center text-[#3F2B6A] mb-8 cursor-pointer"
+            onClick={() => navigate("/")}
+          >
             TalkVN
           </h1>
           <FormProvider {...formMethods}>
