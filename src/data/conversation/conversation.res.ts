@@ -22,6 +22,11 @@ export type GetConversationListItemRES = {
   userReceiverIds: string[];
 };
 
+export type GetConversationFoundByUsernameListItemRES = {
+  conversations: GetConversationListItemRES[];
+  userIds: string[];
+};
+
 export type GetConversationDetailRES = {
   id: string;
   userReceivers: UserReceiverRES[];
