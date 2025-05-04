@@ -98,5 +98,5 @@ export type NotificationDTO = {
 
 export type ConversationInformationDTO = {
   conversationId: string;
-  chatter: UserDTO;
+  chatter: UserDTO[];
 };

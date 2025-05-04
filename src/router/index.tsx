@@ -11,6 +11,7 @@ import ProfilePage from "../pages/private/ProfilePage/ProfilePage";
 import VideoCall from "../pages/private/VideoCall/VideoCall";
 import LoginPage from "../pages/public/LoginPage";
 import SignUpPage from "../pages/public/SignUpPage";
+import GoogleCallbackPage from "../pages/public/GoogleCallbackPage";
 
 export const router = createBrowserRouter([
   {
@@ -63,6 +64,10 @@ export const router = createBrowserRouter([
           {
             path: APP_ROUTE.AUTH.SIGNUP,
             element: <SignUpPage />,
+          },
+          {
+            path: APP_ROUTE.AUTH.GOOGLE_CALLBACK,
+            element: <GoogleCallbackPage />,
           },
         ],
       },

@@ -4,12 +4,14 @@ import {
   HubConnectionBuilder,
   LogLevel,
 } from "@microsoft/signalr";
+import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import MessageItemInList from "../../../components/MessageItemInList";
+import MessageItemInList, { MessageItemInListDTO } from "../../../components/MessageItemInList";
 import {
   GET_CONVERSATION_LIST_PAGE_SIZE,
   useCreateConversationByUsernameMutation,
   useGetConversationListQuery,
+  useLazyGetConversationListByUsernameQuery,
 } from "../../../data/conversation/conversation.api";
 import { GlobalState } from "../../../data/global/global.slice";
 import { socketBaseUrl } from "../../../helpers/constants/configs.constant";
@@ -21,11 +23,11 @@ function MessagesPage() {
   const { userInfo }: GlobalState = useAppSelector((state) => state.global);
 
   const { data: messageListData } = useGetConversationListQuery({
-    PageIndex: 0,
+    PageIndex: 1,
     PageSize: GET_CONVERSATION_LIST_PAGE_SIZE,
   });
 
-  const [chatter, setChatter] = useState<UserDTO>();
+  const [chatter, setChatter] = useState<UserDTO[]>();
 
   const [selectedMessageId, setSelectedMessageId] = useState<string>(
     messageListData?.data?.[0]?.messageId || ""
@@ -34,6 +36,10 @@ function MessagesPage() {
 
   const [createConversation] = useCreateConversationByUsernameMutation();
 
+  const [refetchConversationList] = useLazyGetConversationListByUsernameQuery();
+  const [searchResult, setSearchResult] = useState<MessageItemInListDTO[] | null>(null);
+  const messagesToRender = searchResult ?? messageListData?.data ?? [];
+  
   useEffect(() => {
     const setupSignalR = async () => {
       const newConnection = new HubConnectionBuilder()
@@ -78,33 +84,48 @@ function MessagesPage() {
             </div> */}
 
             {/* 🔍 Input tìm và tạo chat mới */}
-            {/* 🔍 Input tìm và tạo chat mới */}
             <input
               type="text"
               placeholder="Nhập @username để bắt đầu chat..."
-              className="px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring w-full"
+              className="px-2 py-2 border rounded-lg text-sm focus:outline-none focus:ring w-full"
               onKeyDown={async (e) => {
                 if (e.key === "Enter") {
-                  const input = (e.target as HTMLInputElement).value
-                    .trim()
-                    .replace(/^@/, "");
-
-                  if (!input || input === userInfo.username) return;
-
-                  try {
-                    const res = await createConversation({
-                      username: input,
-                    }).unwrap(); // gọi mutation từ RTK Query
-                    setSelectedMessageId(res.id);
-                    setChatter(res.chatterInfo.chatter);
-                  } catch (err: unknown) {
-                    console.error("Lỗi khi tạo đoạn chat:", err);
-                    alert("Không tìm thấy người dùng hoặc lỗi tạo đoạn chat.");
+                  e.preventDefault(); // ngăn submit form nếu có
+              
+                  const rawInput = (e.target as HTMLInputElement).value.trim();
+              
+                  if (!rawInput) {
+                    setSearchResult(null); // 👈 reset để messagesToRender lấy từ messageListData
+                    return;
                   }
-
-                  (e.target as HTMLInputElement).value = ""; // xoá input sau khi tạo
+              
+                  // ✨ Bước 1: Tách chuỗi thành mảng username
+                  const usernames = rawInput
+                    .split(",")                          // tách theo dấu phẩy
+                    .map((u) => u.trim().replace(/^@/, "")) // xoá khoảng trắng và dấu @
+                    .filter((u) => u.length > 0 && u !== userInfo.username); // bỏ rỗng và chính mình
+              
+                  if (usernames.length === 0) {
+                    enqueueSnackbar("Không có username hợp lệ", { variant: "warning" });
+                    return;
+                  }
+              
+                  try {
+                    const result = await refetchConversationList({
+                      PageIndex: 1,
+                      PageSize: 10,
+                      usernames: usernames,
+                    }).unwrap();
+              
+                    setSearchResult(result.data); // gán kết quả vào state mới
+                  } catch (err) {
+                    console.error("Lỗi tìm kiếm:", err);
+                    enqueueSnackbar("Không tìm thấy người dùng", { variant: "error" });
+                  }
+              
+                  (e.target as HTMLInputElement).value = ""; // reset ô input
                 }
-              }}
+              }}              
             />
           </div>
 
@@ -120,20 +141,20 @@ function MessagesPage() {
         <div className="flex flex-row px-4 py-2">
           <div className="font-bold">Messages</div>
         </div>
+
+        {/* A message is a conversation */}
         <div className="flex flex-col mx-3">
-          {messageListData?.data.map((message) => (
+          {messagesToRender.map((message) => (
             <MessageItemInList
               connection={connection}
-              onCurrentSelectedMessage={() =>
-                setSelectedMessageId(message.messageId)
-              }
+              onCurrentSelectedMessage={() => setSelectedMessageId(message.messageId)}
               setChatter={setChatter}
               isActive={selectedMessageId === message.messageId}
               key={message.messageId}
               messageItemData={message}
             />
           ))}
-          {messageListData?.data.length === 0 && (
+          {messagesToRender.length === 0 && (
             // <></>}
             <div className="h-full flex flex-col justify-center items-center">
               {/* <ImageWithFallback

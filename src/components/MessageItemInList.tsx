@@ -11,16 +11,19 @@ export type MessageItemInListDTO = {
   latestMessage: string;
   time: number;
   isRead: boolean;
-  userDisplayName: string;
-  userImageUrl: string;
   fromMe: boolean;
-  receiverId: string;
+  // receiverId: string;
+  // userDisplayName: string;
+  // userImageUrl: string;
+  // receiversId: string[];
+  // usersDisplayName: string[];
+  receivers: UserDTO[];
 };
 
 type MessageItemInListProps = {
   isActive: boolean;
   onCurrentSelectedMessage: (messageId: string) => void;
-  setChatter: Dispatch<SetStateAction<UserDTO | undefined>>;
+  setChatter: Dispatch<SetStateAction<UserDTO[] | undefined>>;
   messageItemData: MessageItemInListDTO;
   connection: HubConnection | null;
 };
@@ -36,15 +39,26 @@ function MessageItemInList({
     <button
       onClick={() => {
         onCurrentSelectedMessage(messageItemData.messageId);
-        setChatter({
-          id: messageItemData.receiverId,
-          username: messageItemData.userDisplayName,
-          userDisplayName: messageItemData.userDisplayName,
-          profileImage: {
-            key: messageItemData.userImageUrl,
-            url: messageItemData.userImageUrl,
-          },
-        });
+        // setChatter({
+        //   id: messageItemData.receiversId,
+        //   username: messageItemData.usersDisplayName,
+        //   usersDisplayName: messageItemData.usersDisplayName,
+        //   profileImage: {
+        //     key: messageItemData.userImageUrl,
+        //     url: messageItemData.userImageUrl,
+        //   },
+        // });
+        setChatter(
+          messageItemData.receivers.map((receiver) => ({
+            id: receiver.id,
+            username: receiver.username,
+            userDisplayName: receiver.userDisplayName,
+            profileImage: {
+              key: receiver.profileImage.key,
+              url: receiver.profileImage.url,
+            },
+          }))
+        );
         connection
           ?.invoke(
             WEB_SOCKET_EVENT.JOIN_CONVERSATION_GROUP,
@@ -59,7 +73,7 @@ function MessageItemInList({
     >
       <ImageWithFallback
         className="h-12 w-12 rounded-full"
-        src={messageItemData.userImageUrl}
+        src={messageItemData.receivers[0].profileImage.url}
         alt="userImage"
       />
       <div className={twMerge("flex-col flex-nowrap")}>
@@ -68,7 +82,13 @@ function MessageItemInList({
             !messageItemData.isRead && "text-gray-900 font-semibold"
           )}
         >
-          {messageItemData.userDisplayName}
+          {/* {messageItemData.userDisplayName} */}
+          {messageItemData.receivers.map((userDisplayName, index) => (
+            <span key={index}>
+              {userDisplayName.userDisplayName}
+              {index < messageItemData.receivers.length - 1 && ", "}
+            </span>
+          ))}
         </div>
         <div
           className={twMerge(

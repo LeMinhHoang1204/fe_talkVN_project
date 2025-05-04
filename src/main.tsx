@@ -15,6 +15,7 @@ createRoot(document.getElementById("root")!).render(
       <Provider store={store}>
         <Suspense fallback={<div>Loading...</div>}>
           <App />
+          {/* <MyApp /> */}
         </Suspense>
       </Provider>
     </SnackbarProvider>

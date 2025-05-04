@@ -18,9 +18,17 @@ const authApi = createApi({
         body,
       }),
     }),
+
+    exchangeAuthCode: builder.mutation<BaseResponse<LoginRES>, { authCode: string }>({
+      query: ({ authCode }) => ({
+        url: `/exchange-authcode?authCode=${authCode}`,
+        method: HTTP_METHOD.POST,
+      }),
+    }),
+
   }),
 });
 
-export const { useLoginMutation } = authApi;
+export const { useLoginMutation, useExchangeAuthCodeMutation } = authApi;
 
 export default authApi;
