@@ -16,6 +16,8 @@
 // export default MyApp;
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+// import { RouterProvider } from "react-router-dom";
+// import { router } from "./route/index";
 import Home from "./pages/private/Home/Home";
 import ChannelSidebar from "./pages/private/Home/LeftSideBar";
 import RightSidebarGrChat from "./pages/private/Home/RightSidebarGrChat";
@@ -37,7 +39,7 @@ function AppLayout() {
       <div className="flex-1 relative bg-gray-100">
         <TopBarChannel />
         <div className="pt-[60px] h-full overflow-y-auto flex justify-center items-center">
-          <WelcomePage /> {/* 👈 thêm dòng này */}
+          <WelcomePage />
         </div>{" "}
       </div>
 

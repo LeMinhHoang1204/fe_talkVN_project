@@ -359,3 +359,4 @@ const Home = () => {
 };
 
 export default Home;
+export const GET_POST_HOME_PAGE_SIZE = 10; // hoặc giá trị tương ứng

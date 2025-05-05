@@ -2,7 +2,7 @@ import {
   HTTP_METHOD,
   TAG_TYPES,
 } from "../../helpers/constants/common.constant";
-import { GET_POST_HOME_PAGE_SIZE } from "../../pages/private/HomePage/HomePage";
+import { GET_POST_HOME_PAGE_SIZE } from "../../pages/private/Home/Home";
 import { GET_POST_PROFILE_PAGE_SIZE } from "../../pages/private/ProfilePage/ProfilePage";
 import {
   BaseResponse,

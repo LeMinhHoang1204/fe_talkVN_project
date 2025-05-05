@@ -10,6 +10,8 @@ const avatars = [
 
 const SideBar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
+  const [groupType, setGroupType] = useState("public");
 
   const handleAvatarClick = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -67,15 +69,128 @@ const SideBar: React.FC = () => {
                 {item.groupName}
               </div>
             )}
+
+            {showCreateGroupModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-[#1e122d] text-white p-5 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl space-y-4">
+                  <h2 className="text-lg font-semibold text-center">
+                    Tạo nhóm mới
+                  </h2>
+
+                  {/* Tên nhóm */}
+                  <div>
+                    <label className="block text-sm mb-1">Tên nhóm</label>
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 rounded bg-[#2c2c2c] text-white border border-gray-600 focus:outline-none"
+                      placeholder="Nhập tên nhóm"
+                    />
+                  </div>
+
+                  {/* Mô tả */}
+                  <div>
+                    <label className="block text-sm mb-1">Mô tả</label>
+                    <textarea
+                      rows={2}
+                      className="w-full px-3 py-2 rounded bg-[#2c2c2c] text-white border border-gray-600 focus:outline-none resize-none"
+                      placeholder="Nhập mô tả nhóm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm mb-1">
+                      Chọn chế dộ riêng tư
+                    </label>
+                    <div className="flex items-center space-x-4">
+                      <label className="inline-flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="groupType"
+                          value="public"
+                          checked={groupType === "public"}
+                          onChange={(e) => setGroupType(e.target.value)}
+                          className="form-radio text-purple-600"
+                        />
+                        <span className="text-sm">Public</span>
+                      </label>
+                      <label className="inline-flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="groupType"
+                          value="private"
+                          checked={groupType === "private"}
+                          onChange={(e) => setGroupType(e.target.value)}
+                          className="form-radio text-purple-600"
+                        />
+                        <span className="text-sm">Private</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Mật khẩu nếu private */}
+                  {groupType === "private" && (
+                    <div>
+                      <label className="block text-sm mb-1">
+                        Mật khẩu nhóm
+                      </label>
+                      <input
+                        type="password"
+                        className="w-full px-3 py-2 rounded bg-[#2c2c2c] text-white border border-gray-600 focus:outline-none"
+                        placeholder="Nhập mật khẩu"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-sm mb-1">
+                      Số lượng thành viên tối đa
+                    </label>
+                    <input
+                      type="number"
+                      min={2}
+                      className="w-full px-3 py-2 rounded bg-[#2c2c2c] text-white border border-gray-600 focus:outline-none"
+                      placeholder="Nhập số lượng"
+                    />
+                  </div>
+
+                  <div className="flex justify-end space-x-3 pt-2">
+                    <button
+                      onClick={() => setShowCreateGroupModal(false)}
+                      className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded text-sm"
+                    >
+                      Hủy
+                    </button>
+                    <button
+                      onClick={() => {
+                        console.log("Tạo nhóm mới");
+                        setShowCreateGroupModal(false);
+                      }}
+                      className="px-4 py-2 bg-[#5b21b6] hover:bg-[#6d28d9] rounded text-sm"
+                    >
+                      Tạo nhóm
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         ))}
-
-        <button className="w-12 h-12 bg-[#2E1A47] text-white rounded-full hover:rounded-2xl flex items-center justify-center transition-all duration-200">
-          <Plus size={24} />
-        </button>
+        <div className="relative group/icon">
+          <button
+            className="w-12 h-12 bg-[#2E1A47] text-white rounded-full hover:rounded-2xl flex items-center justify-center transition-all duration-200"
+            onClick={() => setShowCreateGroupModal(true)}
+          >
+            <Plus size={24} />
+          </button>
+          <div
+            className="absolute top-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block"
+            style={{ fontSize: "11px" }}
+          >
+            Tạo nhóm{" "}
+          </div>
+        </div>
       </div>
 
-      {/* Avatar cá nhân với menu */}
       <div className="relative group">
         <button onClick={handleAvatarClick}>
           <img
