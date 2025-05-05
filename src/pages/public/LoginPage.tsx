@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 // import ImageWithFallback from "../../components/ImageWithFallback";
 import { useLoginMutation } from "../../data/auth/auth.api";
 import { loginThunk } from "../../data/auth/auth.thunk";
+import { apiBaseUrl } from "../../helpers/constants/configs.constant";
 import { APP_ROUTE } from "../../helpers/constants/route.constant";
 import { useAppDispatch } from "../../hooks/reduxHooks";
 
@@ -40,6 +41,10 @@ function LoginPage() {
         console.log("err", err);
         enqueueSnackbar("Login failed", { variant: "error" });
       });
+  };
+
+  const onLoginByGoogle = () => {
+    window.location.href = `${apiBaseUrl}/User/login-google`;
   };
 
   const navigate = useNavigate();
@@ -134,7 +139,6 @@ function LoginPage() {
                   onClick={() => {
                     navigate(APP_ROUTE.AUTH.SIGNUP);
                   }}
-<<<<<<< HEAD
                   className="text-[#4BB4F8] text-xs font-medium "
                 >
                   Sign up
@@ -144,34 +148,6 @@ function LoginPage() {
           </FormProvider>
         </div>
       </div>
-=======
-                />
-              )}
-            />
-          </div>
-
-          <button
-            disabled={isLoginLoading}
-            onClick={handleSubmit(onLogin)}
-            className="px-4 text-xs font-semibold text-white py-2 bg-[#4BB4F8] rounded-md"
-          >
-            Login
-          </button>
-
-          <div className="text-xs text-gray-500 flex flex-row justify-center gap-2">
-            Don't have an account?{" "}
-            <button
-              onClick={() => {
-                navigate(APP_ROUTE.AUTH.SIGNUP);
-              }}
-              className="text-[#4BB4F8] text-xs font-medium "
-            >
-              Sign up
-            </button>
-          </div>
-        </form>
-      </FormProvider>
->>>>>>> 5900bff (dai)
     </div>
   );
 }

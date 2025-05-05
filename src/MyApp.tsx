@@ -16,8 +16,6 @@
 // export default MyApp;
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-// import { RouterProvider } from "react-router-dom";
-// import { router } from "./route/index";
 import Home from "./pages/private/Home/Home";
 import ChannelSidebar from "./pages/private/Home/LeftSideBar";
 import RightSidebarGrChat from "./pages/private/Home/RightSidebarGrChat";

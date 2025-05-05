@@ -26,7 +26,16 @@ const RightSidebarGrChat: React.FC = () => {
   const admins = members.filter((m) => m.isAdmin);
   const regularMembers = members.filter((m) => !m.isAdmin);
 
-  const renderMemberItem = (member: any) => (
+  interface Member {
+    id: number;
+    name: string;
+    avatar: string;
+    email: string;
+    phone: string;
+    isAdmin: boolean;
+  }
+
+  const renderMemberItem = (member: Member) => (
     <div
       key={member.id}
       className="relative mb-3 cursor-pointer group"
