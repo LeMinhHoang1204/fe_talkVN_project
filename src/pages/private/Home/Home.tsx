@@ -1,4 +1,8 @@
+import { useNavigate } from "react-router-dom";
+import { APP_ROUTE } from "../../../helpers/constants/route.constant";
+
 const Home = () => {
+  const navigate = useNavigate();
   return (
     <div className="relative min-h-screen w-full overflow-hidden ">
       <video
@@ -49,7 +53,10 @@ const Home = () => {
           <a href="#">Contact</a>
         </div>
         <div className="space-x-2">
-          <button className="bg-white text-black px-4 py-1 rounded">
+          <button
+            className="bg-white text-black px-4 py-1 rounded"
+            onClick={() => navigate(APP_ROUTE.AUTH.LOGIN)}
+          >
             Sign in
           </button>
           <button className="bg-purple-800 text-white px-4 py-1 rounded">
