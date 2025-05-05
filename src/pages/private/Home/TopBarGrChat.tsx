@@ -4,7 +4,7 @@ import React from "react";
 const TopBarChannel: React.FC = () => {
   return (
     <div
-      className="fixed top-0 left-0 w-full z-50 bg-[#313338] text-white border-b border-black/50"
+      className="fixed top-0 left-0 w-full z-40 bg-[#313338] text-white border-b border-black/50"
       style={{
         height: "60px",
         left: "295px",

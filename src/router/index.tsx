@@ -5,7 +5,6 @@ import PrivateRoute from "../layouts/PrivateRoute";
 import PublicRoute from "../layouts/PublicRoute";
 import ExplorePage from "../pages/private/ExplorePage/ExplorePage";
 import SearchPostPage from "../pages/private/ExplorePage/SearchPostPage";
-import Home from "../pages/private/Home/Home";
 import HomePage from "../pages/private/HomePage/HomePage";
 import MessagesPage from "../pages/private/MessagePage/MessagesPage";
 import ProfilePage from "../pages/private/ProfilePage/ProfilePage";
@@ -55,7 +54,7 @@ export const router = createBrowserRouter([
     element: <PublicRoute />,
     children: [
       {
-        path: "/",
+        path: APP_ROUTE.AUTH.self,
         element: <Outlet />,
         children: [
           {
