@@ -5,7 +5,10 @@ import PrivateRoute from "../layouts/PrivateRoute";
 import PublicRoute from "../layouts/PublicRoute";
 import ExplorePage from "../pages/private/ExplorePage/ExplorePage";
 import SearchPostPage from "../pages/private/ExplorePage/SearchPostPage";
+<<<<<<< HEAD
 import HomePage from "../pages/private/HomePage/HomePage";
+=======
+>>>>>>> 5900bff (dai)
 import MessagesPage from "../pages/private/MessagePage/MessagesPage";
 import ProfilePage from "../pages/private/ProfilePage/ProfilePage";
 import VideoCall from "../pages/private/VideoCall/VideoCall";
@@ -21,11 +24,6 @@ export const router = createBrowserRouter([
         path: "/",
         element: <MainLayout />,
         children: [
-          {
-            index: true,
-            path: APP_ROUTE.MAIN.HOME,
-            element: <HomePage />,
-          },
           {
             path: APP_ROUTE.MAIN.EXPLORE,
             element: <ExplorePage />,
@@ -57,6 +55,11 @@ export const router = createBrowserRouter([
         path: APP_ROUTE.AUTH.self,
         element: <Outlet />,
         children: [
+          // {
+          //   index: true,
+          //   path: APP_ROUTE.AUTH.HOME,
+          //   element: <Home />,
+          // },
           {
             index: true,
             element: <Home />,
