@@ -24,7 +24,8 @@ function UserNameDisplay({
   };
 
   return (
-    <button onClick={handleNavigateToUserProfile}>
+    <button> 
+      {/* onClick={handleNavigateToUserProfile}> */}
       <span className={twMerge("font-medium", className)}>{username}</span>
     </button>
   );

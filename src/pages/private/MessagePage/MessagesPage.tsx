@@ -7,6 +7,7 @@ import {
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 import MessageItemInList, { MessageItemInListDTO } from "../../../components/MessageItemInList";
+import UserNameDisplay from "../../../components/UserNameDisplay";
 import {
   GET_CONVERSATION_LIST_PAGE_SIZE,
   useCreateConversationByUsernameMutation,
@@ -22,7 +23,7 @@ import Conversation from "../components/Conversation";
 function MessagesPage() {
   const { userInfo }: GlobalState = useAppSelector((state) => state.global);
 
-  const { data: messageListData } = useGetConversationListQuery({
+  const { data: messageListData, refetch } = useGetConversationListQuery({
     PageIndex: 1,
     PageSize: GET_CONVERSATION_LIST_PAGE_SIZE,
   });
@@ -39,6 +40,8 @@ function MessagesPage() {
   const [refetchConversationList] = useLazyGetConversationListByUsernameQuery();
   const [searchResult, setSearchResult] = useState<MessageItemInListDTO[] | null>(null);
   const messagesToRender = searchResult ?? messageListData?.data ?? [];
+
+  const [searchedUsers, setSearchedUsers] = useState<UserDTO[]>([]);
   
   useEffect(() => {
     const setupSignalR = async () => {
@@ -70,62 +73,81 @@ function MessagesPage() {
     };
   }, []);
 
+  const handleUsernameSearch = async (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key !== "Enter") return;
+  
+    e.preventDefault();
+    const rawInput = (e.target as HTMLInputElement).value.trim();
+  
+    if (!rawInput) {
+      setSearchResult(null);
+      return;
+    }
+  
+    const usernames = rawInput
+      .split(",")
+      .map((u) => u.trim().replace(/^@/, ""))
+      .filter((u) => u.length > 0 && u !== userInfo.username);
+  
+    if (usernames.length === 0) {
+      enqueueSnackbar("Không có username hợp lệ", { variant: "warning" });
+      return;
+    }
+  
+    try {
+      const { data, searchedUsers } = await refetchConversationList({
+        PageIndex: 1,
+        PageSize: 10,
+        usernames: usernames,
+      }).unwrap();
+  
+      setSearchResult(data);
+      setSearchedUsers(searchedUsers); 
+    } catch (err) {
+      enqueueSnackbar("Không tìm thấy người dùng", { variant: "error" });
+    } finally {
+      (e.target as HTMLInputElement).value = "";
+    }
+  };
+
+  const handleCreateConversation = async () => {
+    try {
+      await createConversation({ userIds: searchedUsers.map(user => user.id) });
+    } catch (error) {
+      console.error("Lỗi tạo đoạn chat:", error);
+      enqueueSnackbar("Không thể tạo đoạn chat", { variant: "error" });
+    }
+    finally {
+      setSearchResult(null);
+      setSearchedUsers([]);
+      await refetch().then(() => {
+        enqueueSnackbar("Tạo đoạn chat thành công", { variant: "success" });
+      });
+    }
+  };
+  
   return (
     <div className="flex flex-row w-full h-full">
       <div className="border flex flex-col md:w-[420px] h-full overflow-auto">
         <div className="flex flex-row justify-between px-4 pt-8">
           <div className="flex flex-col gap-2 px-4 pt-6">
-            {/* <div className="flex flex-row justify-between items-center">
+            <div className="flex flex-row justify-between items-center">
               <UserNameDisplay
                 id={userInfo.userId}
                 className="text-blue-400"
                 username={`@${userInfo.username}`}
               />
-            </div> */}
+            </div>
 
-            {/* 🔍 Input tìm và tạo chat mới */}
+            {/* Tim chat */}
             <input
               type="text"
-              placeholder="Nhập @username để bắt đầu chat..."
-              className="px-2 py-2 border rounded-lg text-sm focus:outline-none focus:ring w-full"
-              onKeyDown={async (e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault(); // ngăn submit form nếu có
-              
-                  const rawInput = (e.target as HTMLInputElement).value.trim();
-              
-                  if (!rawInput) {
-                    setSearchResult(null); // 👈 reset để messagesToRender lấy từ messageListData
-                    return;
-                  }
-              
-                  // ✨ Bước 1: Tách chuỗi thành mảng username
-                  const usernames = rawInput
-                    .split(",")                          // tách theo dấu phẩy
-                    .map((u) => u.trim().replace(/^@/, "")) // xoá khoảng trắng và dấu @
-                    .filter((u) => u.length > 0 && u !== userInfo.username); // bỏ rỗng và chính mình
-              
-                  if (usernames.length === 0) {
-                    enqueueSnackbar("Không có username hợp lệ", { variant: "warning" });
-                    return;
-                  }
-              
-                  try {
-                    const result = await refetchConversationList({
-                      PageIndex: 1,
-                      PageSize: 10,
-                      usernames: usernames,
-                    }).unwrap();
-              
-                    setSearchResult(result.data); // gán kết quả vào state mới
-                  } catch (err) {
-                    console.error("Lỗi tìm kiếm:", err);
-                    enqueueSnackbar("Không tìm thấy người dùng", { variant: "error" });
-                  }
-              
-                  (e.target as HTMLInputElement).value = ""; // reset ô input
-                }
-              }}              
+              placeholder="Nhập @username để bắt đầu chat (mặc định là email)" 
+              className="w-[370px] px-4 py-2 text-sm border border-gray-300 rounded-xl shadow-sm 
+             focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
+              onKeyDown={handleUsernameSearch}           
             />
           </div>
 
@@ -166,6 +188,14 @@ function MessagesPage() {
                 "No messages yet. Start a conversation by sending a message to someone."
               }
             </div>
+          )}
+          {searchedUsers.length > 0 && (
+            <button
+              onClick={handleCreateConversation}
+              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Tạo đoạn chat mới với @{searchedUsers.map(u => u.userDisplayName).join(", @")}
+            </button>
           )}
         </div>
       </div>
