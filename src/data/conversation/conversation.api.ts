@@ -1,4 +1,4 @@
-import { MessageItemInListDTO } from "../../components/MessageItemInList";
+import { ConversationListWithUserIds, MessageItemInListDTO } from "../../components/MessageItemInList";
 import {
   HTTP_METHOD,
   TAG_TYPES,
@@ -103,24 +103,16 @@ const conversationApi = usersApi.injectEndpoints({
         }),
       }
     ),
-    createConversationByUsername: build.mutation<
-      { id: string; chatterInfo: ConversationInformationDTO }, // kiểu dữ liệu trả về từ BE
-      { username: string } // kiểu dữ liệu gửi lên
-    >({
-      query: (body) => ({
-        url: `/conversations/create`,
-        method: HTTP_METHOD.POST,
-        body,
-      }),
-    }),
+    // search conversation by usernames
     getConversationListByUsername: build.query<
-      PaginationDTO<MessageItemInListDTO>,
+    ConversationListWithUserIds,
       GetConversationListItemREQ
     >({
-      query: (params) => ({
+      query: ({PageIndex, PageSize, usernames}) => ({
         url: `/Conversation/search`,
-        method: HTTP_METHOD.GET,
-        params,
+        method: HTTP_METHOD.POST,
+        params: { PageIndex, PageSize },
+        body: { usernames },
       }),
       transformResponse: (
         response: BaseResponse<GetConversationFoundByUsernameListItemRES>
@@ -128,9 +120,29 @@ const conversationApi = usersApi.injectEndpoints({
         data: response.result.conversations.map((conversation) =>
           getMessageListItemDTO(conversation)
         ),
+        searchedUsers: response.result.searchedUsers.map((user) => ({
+          id: user.id,
+          username: user.displayName,
+          userDisplayName: user.displayName,
+          profileImage: {
+            key: user.avatarUrl,
+            url: user.avatarUrl,
+          },
+        })),
         isLastPage: response.result.conversations.length < GET_CONVERSATION_LIST_PAGE_SIZE,
       }),
       providesTags: [TAG_TYPES.CONVERSATION_LIST],
+    }),
+    // create conversation by userIds
+    createConversationByUsername: build.mutation<
+      PaginationDTO<MessageItemInListDTO>, // kiểu dữ liệu trả về từ BE
+      { userIds: string[] } // kiểu dữ liệu gửi lên
+    >({
+      query: (body) => ({
+        url: `/Conversation`,
+        method: HTTP_METHOD.POST,
+        body,
+      }),
     }),
   }),
 });
