@@ -7,8 +7,9 @@ import { EXPANDED_CONTENT_TYPE } from "../types/side-bar.type";
 // import SideBar from "./components/SideBar";
 import SideBarExpandedContent from "./components/SideBarExpandedContent";
 import ChannelSidebar from "../pages/private/Home/ChannelSideBar.tsx";
-import ConversationPage from "../pages/private/Home/ConversatioinPage.tsx";
-import SideBar from "../pages/private/Home/SideBar.tsx";
+// import ConversationPage from "../pages/private/Home/ConversatioinPage.tsx";
+// import SideBar from "../pages/private/Home/SideBar.tsx";
+import SideBar from "./components/SideBar";
 
 
 function MainLayout() {
@@ -20,29 +21,29 @@ function MainLayout() {
     sideBarExpandedContent === EXPANDED_CONTENT_TYPE.MESSAGES ||
     sideBarExpandedContent === EXPANDED_CONTENT_TYPE.PROFILE;
 
-  // return (
-  //   <div className="flex flex-row flex-start h-full">
-  //     <div
-  //       className={`relative transition-all ${
-  //         isSidebarExpanded ? "w-24" : "w-[500px]"
-  //       }`}
-  //     >
-  //       <SideBar />
-  //       <SideBarExpandedContent />
-  //     </div>
-  //     <div className="w-full h-full">
-  //       <Outlet />
-  //     </div>
-  //     <AddPostModal />
-  //   </div>
-  // );
   return (
-    <div className="flex">
-      <div className="w-[5%] bg-[#18092f]"> {/* group bar */}  <SideBar /></div>
-      <div className="w-[18%]"> <ChannelSidebar /> </div>
-      <div className="flex-1 bg-gray-100"> {/* Nội dung chính */} <ConversationPage/> </div>
+    <div className="flex flex-row flex-start h-full">
+      <div
+        className={`relative transition-all ${
+          isSidebarExpanded ? "w-24" : "w-[500px]"
+        }`}
+      >
+        <SideBar />
+        <SideBarExpandedContent />
+      </div>
+      <div className="w-full h-full">
+        <Outlet />
+      </div>
+      <AddPostModal />
     </div>
   );
+  // return (
+  //   <div className="flex">
+  //     <div className="w-[5%] bg-[#18092f]"> {/* group bar */}  <SideBar /></div>
+  //     <div className="w-[18%]"> <ChannelSidebar /> </div>
+  //     <div className="flex-1 bg-gray-100"> {/* Nội dung chính */} <ConversationPage/> </div>
+  //   </div>
+  // );
 }
 
 export default MainLayout;

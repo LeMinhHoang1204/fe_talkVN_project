@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import ImageWithFallback from "../../components/ImageWithFallback";
 import { useLoginMutation } from "../../data/auth/auth.api";
 import { loginThunk } from "../../data/auth/auth.thunk";
+import { apiBaseUrl } from "../../helpers/constants/configs.constant";
 import { APP_ROUTE } from "../../helpers/constants/route.constant";
 import { useAppDispatch } from "../../hooks/reduxHooks";
 
@@ -40,6 +41,10 @@ function LoginPage() {
         console.log("err", err);
         enqueueSnackbar("Login failed", { variant: "error" });
       });
+  };
+
+  const onLoginByGoogle = () => {
+    window.location.href = `${apiBaseUrl}/User/login-google`;
   };
 
   const navigate = useNavigate();
@@ -101,6 +106,14 @@ function LoginPage() {
             className="px-4 text-xs font-semibold text-white py-2 bg-[#4BB4F8] rounded-md"
           >
             Login
+          </button>
+
+          <button
+            type="button"  
+            onClick={onLoginByGoogle}
+            className="px-4 text-xs font-semibold text-white py-2 bg-[#4BB4F8] rounded-md"
+          >
+            Login by Google
           </button>
 
           <div className="text-xs text-gray-500 flex flex-row justify-center gap-2">

@@ -25,7 +25,7 @@ import Message from "./Message";
 
 type ConversationProps = {
   conversationId: string;
-  chatter: UserDTO;
+  chatter: UserDTO[];
   lastChatterActiveTime: number;
   connection: HubConnection | null;
 };
@@ -38,59 +38,66 @@ function Conversation({
 }: ConversationProps) {
   const { userInfo }: GlobalState = useAppSelector((state) => state.global);
 
-  const [conversationData, setConversationData] = useState<ConversationDTO[]>(
-    []
-  );
-  const [isShowConversationInfoExpanded, setIsShowConversationInfoExpanded] =
-    useState<boolean>(false);
+  const [conversationData, setConversationData] = useState<ConversationDTO[]>([]);
+
+  const [isShowConversationInfoExpanded, setIsShowConversationInfoExpanded] = useState<boolean>(false);
 
   const lastMessageRef = useRef<HTMLDivElement | null>(null);
 
   const { data: CONVERSATION_DATA_QUERY } = useGetConversationDetailQuery({
     conversationId,
-    messagePageIndex: 0,
+    messagePageIndex: 1,
     messagePageSize: 100,
+  }, {
+    refetchOnMountOrArgChange: true,
   });
 
+  // query conversation data
   useEffect(() => {
     setConversationData(CONVERSATION_DATA_QUERY?.data || []);
-  }, [CONVERSATION_DATA_QUERY?.data]);
-
+  }, [conversationId, CONVERSATION_DATA_QUERY?.data]);
+  
   // Handle send message
   const handleSendMessage = useCallback(
     (newMessage: MessageRES) => {
-      setConversationData((prev) => [
-        ...prev,
-        {
-          conversationId: newMessage.id,
+      setConversationData((prev) => {
+        const exists = prev.some(msg => msg.message.messageId === newMessage.id);
+        if (exists) return prev;
+      
+        return [...prev, {
+          conversationId: newMessage.conversationId,
           senderId: userInfo.userId,
           message: {
             messageId: newMessage.id,
             content: newMessage.messageText,
             time: newMessage.createdOn,
           },
-        },
-      ]);
+        }];
+      });
+
     },
     [userInfo.userId]
   );
 
+  // Handle receive message
   const handleReceiveMessage = useCallback(
     (newMessage: MessageRES) => {
-      setConversationData((prev) => [
-        ...prev,
-        {
-          conversationId: conversationId,
-          senderId: chatter.id,
+      setConversationData((prev) => {
+        const exists = prev.some(msg => msg.message.messageId === newMessage.id);
+        if (exists) return prev;
+      
+        return [...prev, {
+          conversationId: newMessage.conversationId,
+          senderId: newMessage.senderId,
           message: {
             messageId: newMessage.id,
             content: newMessage.messageText,
             time: newMessage.createdOn,
           },
-        },
-      ]);
+        }];
+      });
     },
-    [chatter.id, conversationId]
+    [chatter, conversationId]
   );
 
   useEffect(() => {
@@ -100,16 +107,16 @@ function Conversation({
   }, [conversationData]);
 
   // handle read message
-
   const [getConversationInformation] = useLazyGetConversationInformationQuery();
 
   useEffect(() => {
     connection?.on(WEB_SOCKET_EVENT.NEW_MESSAGE, (message: MessageRES) => {
-      if (message.senderId === chatter.id) {
+      if (chatter.some((user) => user.id === message.senderId)) {
         handleReceiveMessage(message);
-      } else {
+      } else if (message.senderId === userInfo.userId) {
         handleSendMessage(message);
       }
+      
     });
     connection?.on(WEB_SOCKET_EVENT.RECEIVE_CALL, (conversationId: string) => {
       getConversationInformation(conversationId)
@@ -126,7 +133,7 @@ function Conversation({
       connection?.off(WEB_SOCKET_EVENT.NEW_MESSAGE, handleReceiveMessage);
     };
   }, [
-    chatter.id,
+    chatter,
     connection,
     getConversationInformation,
     handleReceiveMessage,
@@ -137,19 +144,24 @@ function Conversation({
     useState<ConversationInformationDTO | null>(null);
 
   return (
-    <div className="w-full h-full flex flex-row ">
+    <div className="w-full h-full flex flex-row bg-[#313338] text-white">
       <div className="w-full h-full flex flex-col">
         {/* Conversation Header */}
-        <div className="flex flex-row justify-between py-3 px-4 border-b">
-          <div className="flex flex-row gap-2">
-            <ImageWithFallback
+        <div className="flex flex-row justify-between py-3 px-4 border-b border-[#000000]/50 text-white">
+          <div className="flex flex-row gap-2 pl-4">
+            {/* <ImageWithFallback
               className="h-12 w-12 rounded-full"
               alt="avatar"
-              src={chatter.profileImage.url}
-            />
+              src={chatter[0].profileImage.url}
+            /> */}
             <div className="flex flex-col justify-center">
-              <span className="font-bold">@{chatter.username}</span>
-              <span className="text-sm text-gray-500">
+              {chatter.map((userDisplayName, index) => (
+              <span key={index}>
+                {userDisplayName.userDisplayName}
+                {index < chatter.length - 1 && ", "}
+              </span>
+            ))}
+              <span className="text-sm text-gray-400">
                 {getActiveTime(lastChatterActiveTime)}
               </span>
             </div>
@@ -179,7 +191,7 @@ function Conversation({
         </div>
 
         {/* Conversation Messages */}
-        <div className="h-full overflow-y-auto">
+        <div className="h-full overflow-y-auto flex flex-col justify-end">
           <div className="px-4 overflow-y-auto flex flex-col justify-end">
             {conversationData.map((messageItem, index) => (
               <Message
@@ -191,7 +203,10 @@ function Conversation({
                     messageItem.senderId !==
                       conversationData[index + 1].senderId)
                 }
-                senderAvatarUrl={chatter.profileImage.url}
+                senderAvatarUrl={chatter[0].profileImage.url}
+                chatter={chatter.find(user => user.id === messageItem.senderId)?.userDisplayName ||
+                  (messageItem.senderId === userInfo.userId ? userInfo.username : "Unknown")
+                }
                 isFirst={
                   (index === 0 ||
                     messageItem.senderId !==
@@ -218,6 +233,7 @@ function Conversation({
 
         {/* Chat Input */}
         <ChatInput conversationId={conversationId} />
+
         {/* <Modal
           open={videoCallInfo !== null}
           onClose={() => setVideoCallInfo(null)}
@@ -248,12 +264,12 @@ function Conversation({
           content={
             <div className="flex flex-col justify-center items-center bg-white shadow-lg py-8 px-4 rounded-3xl">
               <ImageWithFallback
-                src={videoCallInfo?.chatter.profileImage.url || ""}
+                src={videoCallInfo?.chatter[0].profileImage.url || ""}
                 alt="avatar"
                 className="h-24 w-24 rounded-full"
               />
               <div className="text-black text-lg font-medium mt-4">
-                {videoCallInfo?.chatter.userDisplayName} is calling you!
+                {videoCallInfo?.chatter[0].userDisplayName} is calling you!
               </div>
               <p className="text-black">Do you want to join the video call?</p>
               <div className="flex gap-4 mt-8">

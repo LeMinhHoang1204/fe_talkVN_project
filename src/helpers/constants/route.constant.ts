@@ -8,6 +8,7 @@ export const APP_ROUTE = {
     self: ROUTE_NAME.AUTH,
     LOGIN: `/${ROUTE_NAME.AUTH}/login`,
     SIGNUP: `/${ROUTE_NAME.AUTH}/signup`,
+    GOOGLE_CALLBACK: `/${ROUTE_NAME.AUTH}/google/callback`,
   },
   MAIN: {
     self: ROUTE_NAME.MAIN,
