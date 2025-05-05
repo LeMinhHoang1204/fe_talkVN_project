@@ -5,13 +5,12 @@ import PrivateRoute from "../layouts/PrivateRoute";
 import PublicRoute from "../layouts/PublicRoute";
 import ExplorePage from "../pages/private/ExplorePage/ExplorePage";
 import SearchPostPage from "../pages/private/ExplorePage/SearchPostPage";
-import HomePage from "../pages/private/Home/Home";
 import MessagesPage from "../pages/private/MessagePage/MessagesPage";
 import ProfilePage from "../pages/private/ProfilePage/ProfilePage";
 import VideoCall from "../pages/private/VideoCall/VideoCall";
+import GoogleCallbackPage from "../pages/public/GoogleCallbackPage";
 import LoginPage from "../pages/public/LoginPage";
 import SignUpPage from "../pages/public/SignUpPage";
-import GoogleCallbackPage from "../pages/public/GoogleCallbackPage";
 
 export const router = createBrowserRouter([
   {
@@ -21,11 +20,6 @@ export const router = createBrowserRouter([
         path: "/",
         element: <MainLayout />,
         children: [
-          {
-            index: true,
-            path: APP_ROUTE.MAIN.HOME,
-            element: <HomePage />,
-          },
           {
             path: APP_ROUTE.MAIN.EXPLORE,
             element: <ExplorePage />,
@@ -57,6 +51,11 @@ export const router = createBrowserRouter([
         path: APP_ROUTE.AUTH.self,
         element: <Outlet />,
         children: [
+          // {
+          //   index: true,
+          //   path: APP_ROUTE.AUTH.HOME,
+          //   element: <Home />,
+          // },
           {
             path: APP_ROUTE.AUTH.LOGIN,
             element: <LoginPage />,
