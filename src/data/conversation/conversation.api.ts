@@ -17,6 +17,7 @@ import {
 } from "./conversation.req";
 import {
   GetConversationDetailRES,
+  GetConversationFoundByUsernameListItemRES,
   GetConversationListItemRES,
 } from "./conversation.res";
 import {
@@ -48,6 +49,7 @@ const conversationApi = usersApi.injectEndpoints({
       }),
       providesTags: [TAG_TYPES.CONVERSATION_LIST],
     }),
+
     getConversationDetail: build.query<
       PaginationDTO<ConversationDTO>,
       GetConversationListREQ
@@ -67,6 +69,7 @@ const conversationApi = usersApi.injectEndpoints({
           response.result.messages.length < GET_CONVERSATION_DETAIL_PAGE_SIZE,
       }),
     }),
+    
     postAddNewMessage: build.mutation<void, PostAddNewMessageREQ>({
       query: ({ conversationId, messageText }) => ({
         url: `/Conversation/${conversationId}`,
@@ -77,6 +80,7 @@ const conversationApi = usersApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: TAG_TYPES.CONVERSATION_LIST }],
     }),
+    
     getConversationInformation: build.query<ConversationInformationDTO, string>(
       {
         query: (conversationId: string) => ({
@@ -87,15 +91,15 @@ const conversationApi = usersApi.injectEndpoints({
           response: BaseResponse<GetConversationDetailRES>
         ) => ({
           conversationId: response.result.id,
-          chatter: {
-            id: response.result.userReceivers[0].id,
-            username: response.result.userReceivers[0].displayName,
-            userDisplayName: response.result.userReceivers[0].displayName,
+          chatter: response.result.userReceivers.map((user) => ({
+            id: user.id,
+            username: user.displayName,
+            userDisplayName: user.displayName,
             profileImage: {
-              key: response.result.userReceivers[0].avatarUrl,
-              url: response.result.userReceivers[0].avatarUrl,
+              key: user.avatarUrl,
+              url: user.avatarUrl,
             },
-          },
+          })),
         }),
       }
     ),
@@ -109,6 +113,25 @@ const conversationApi = usersApi.injectEndpoints({
         body,
       }),
     }),
+    getConversationListByUsername: build.query<
+      PaginationDTO<MessageItemInListDTO>,
+      GetConversationListItemREQ
+    >({
+      query: (params) => ({
+        url: `/Conversation/search`,
+        method: HTTP_METHOD.GET,
+        params,
+      }),
+      transformResponse: (
+        response: BaseResponse<GetConversationFoundByUsernameListItemRES>
+      ) => ({
+        data: response.result.conversations.map((conversation) =>
+          getMessageListItemDTO(conversation)
+        ),
+        isLastPage: response.result.conversations.length < GET_CONVERSATION_LIST_PAGE_SIZE,
+      }),
+      providesTags: [TAG_TYPES.CONVERSATION_LIST],
+    }),
   }),
 });
 
@@ -118,4 +141,5 @@ export const {
   usePostAddNewMessageMutation,
   useLazyGetConversationInformationQuery,
   useCreateConversationByUsernameMutation,
+  useLazyGetConversationListByUsernameQuery,
 } = conversationApi;

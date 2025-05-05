@@ -9,10 +9,21 @@ export const getMessageListItemDTO = (
   latestMessage: data.lastMessage?.messageText,
   time: data.lastMessage?.updatedOn,
   isRead: data.isSeen,
-  userDisplayName: data.userReceivers[0].displayName,
-  userImageUrl: data.userReceivers[0].avatarUrl,
   fromMe: data.lastMessage?.senderId === data.userReceivers[0].id,
-  receiverId: data.userReceivers[0].id,
+  // receiverId: data.userReceivers[0].id,
+  // userDisplayName: data.userReceivers[0].displayName,
+  // userImageUrl: data.userReceivers[0].avatarUrl,
+  // receiversId: data.userReceivers.map((user) => user.id),
+  // usersDisplayName: data.userReceivers.map((user) => user.displayName),
+  receivers : data.userReceivers.map((user) => ({
+    id: user.id,
+    username: user.displayName,
+    userDisplayName: user.displayName,
+    profileImage: {
+      key: user.avatarUrl,
+      url: user.avatarUrl,
+    },
+  })),
 });
 
 export const getMessageListDetailDTO = (
