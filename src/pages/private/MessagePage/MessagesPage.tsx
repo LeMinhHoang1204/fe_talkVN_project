@@ -144,11 +144,20 @@ function MessagesPage() {
             {/* Tim chat */}
             <input
               type="text"
-              placeholder="Nhập @username để bắt đầu chat (mặc định là email)" 
-              className="w-[370px] px-4 py-2 text-sm border border-gray-300 rounded-xl shadow-sm 
+              list="usernames"
+              placeholder="Nhập @username để bắt đầu chat" 
+              className="w-[280px] px-4 py-2 text-sm border border-gray-300 rounded-xl shadow-sm 
              focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
               onKeyDown={handleUsernameSearch}           
             />
+            <p className="text-s text-gray-500 px-1 pt-1">
+              🔹 Nếu đăng nhập bằng Google, tên người dùng mặc định là email của bạn.  
+            </p>
+
+            <datalist id="usernames">
+              <option value="admin" /> 
+              <option value="admin1" />
+            </datalist>
           </div>
 
           {/* <UserNameDisplay
