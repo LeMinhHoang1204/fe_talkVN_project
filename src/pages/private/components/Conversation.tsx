@@ -143,25 +143,28 @@ function Conversation({
   const [videoCallInfo, setVideoCallInfo] =
     useState<ConversationInformationDTO | null>(null);
 
+
   return (
-    <div className="w-full h-full flex flex-row ">
+    <div className="w-full h-full flex flex-row bg-[#313338] text-white">
       <div className="w-full h-full flex flex-col">
         {/* Conversation Header */}
-        <div className="flex flex-row justify-between py-3 px-4 border-b">
-          <div className="flex flex-row gap-2">
-            <ImageWithFallback
+        <div className="flex flex-row justify-between py-3 px-4 border-b border-[#000000]/50 text-white">
+          <div className="flex flex-row gap-2 pl-4">
+            {/* <ImageWithFallback
               className="h-12 w-12 rounded-full"
               alt="avatar"
               src={chatter[0].profileImage.url}
-            />
+            /> */}
             <div className="flex flex-col justify-center">
+              <div>
               {chatter.map((userDisplayName, index) => (
               <span key={index}>
                 {userDisplayName.userDisplayName}
                 {index < chatter.length - 1 && ", "}
               </span>
             ))}
-              <span className="text-sm text-gray-500">
+            </div>
+              <span className="text-sm text-gray-400">
                 {getActiveTime(lastChatterActiveTime)}
               </span>
             </div>
@@ -191,8 +194,8 @@ function Conversation({
         </div>
 
         {/* Conversation Messages */}
-        <div className="h-full overflow-y-auto">
-          <div className="px-4 overflow-y-auto flex flex-col justify-end">
+        <div className="h-full overflow-y-auto flex flex-col justify-end">
+          <div className="px-4 overflow-y-auto flex flex-col">
             {conversationData.map((messageItem, index) => (
               <Message
                 onlyOneMessageInGroup={
@@ -204,6 +207,9 @@ function Conversation({
                       conversationData[index + 1].senderId)
                 }
                 senderAvatarUrl={chatter[0].profileImage.url}
+                chatter={chatter.find(user => user.id === messageItem.senderId)?.userDisplayName ||
+                  (messageItem.senderId === userInfo.userId ? userInfo.username : "Unknown")
+                }
                 isFirst={
                   (index === 0 ||
                     messageItem.senderId !==
@@ -229,7 +235,7 @@ function Conversation({
         </div>
 
         {/* Chat Input */}
-        <ChatInput conversationId={conversationId} />
+        <ChatInput conversationId={conversationId}  />
 
         {/* <Modal
           open={videoCallInfo !== null}

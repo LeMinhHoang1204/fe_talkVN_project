@@ -66,3 +66,11 @@ export const getActiveTime = (timestamp: Timestamp): string => {
     return `Last active ${postTime.format("YYYY.MM.DD")}`;
   }
 };
+
+export const formatMessageDate = (timestamp: Timestamp): string => {
+  const date = dayjs(timestamp);
+  if (!date.isValid()) {
+    throw new Error("Invalid timestamp");
+  }
+  return date.format("DD MMMM YYYY HH:mm");
+};

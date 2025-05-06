@@ -56,14 +56,13 @@ function HomePage() {
       }
     );
 
-    const currentBottomRef = bottomRef.current;
-    if (currentBottomRef) {
-      observer.observe(currentBottomRef);
+    if (bottomRef.current) {
+      observer.observe(bottomRef.current);
     }
 
     return () => {
-      if (currentBottomRef) {
-        observer.unobserve(currentBottomRef);
+      if (bottomRef.current) {
+        observer.unobserve(bottomRef.current);
       }
     };
   }, [isPostDataFetching, isPostDataLoading, postData?.data.length]);

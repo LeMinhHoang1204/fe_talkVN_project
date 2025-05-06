@@ -4,6 +4,7 @@ import { usePostAddNewMessageMutation } from "../../../data/conversation/convers
 
 type ChatInputProps = {
   conversationId: string;
+  className?: string;
 };
 
 function ChatInput({ conversationId }: ChatInputProps) {
@@ -38,7 +39,7 @@ function ChatInput({ conversationId }: ChatInputProps) {
         }}
         value={newMessage}
         onChange={(e) => setNewMessage(e.target.value)}
-        className="w-full pl-8 py-2 focus:outline-none rounded-3xl border"
+        className="w-full pl-8 py-2 focus:outline-none rounded-2xl bg-[#383A40] text-white text-italic placeholder:text-white/50 placeholder:italic"
         placeholder="Type a message"
         type="text"
       />
