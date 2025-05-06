@@ -80,7 +80,6 @@ const conversationApi = usersApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: TAG_TYPES.CONVERSATION_LIST }],
     }),
-    
     getConversationInformation: build.query<ConversationInformationDTO, string>(
       {
         query: (conversationId: string) => ({
@@ -152,6 +151,6 @@ export const {
   useGetConversationDetailQuery,
   usePostAddNewMessageMutation,
   useLazyGetConversationInformationQuery,
-  useCreateConversationByUsernameMutation,
   useLazyGetConversationListByUsernameQuery,
+  useCreateConversationByUsernameMutation,
 } = conversationApi;
