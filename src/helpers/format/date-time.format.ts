@@ -72,5 +72,5 @@ export const formatMessageDate = (timestamp: Timestamp): string => {
   if (!date.isValid()) {
     throw new Error("Invalid timestamp");
   }
-  return date.format("dddd, DD MMMM YYYY HH:mm");
+  return date.format("DD MMMM YYYY HH:mm");
 };

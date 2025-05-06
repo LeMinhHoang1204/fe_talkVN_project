@@ -143,6 +143,7 @@ function Conversation({
   const [videoCallInfo, setVideoCallInfo] =
     useState<ConversationInformationDTO | null>(null);
 
+
   return (
     <div className="w-full h-full flex flex-row bg-[#313338] text-white">
       <div className="w-full h-full flex flex-col">
@@ -155,12 +156,14 @@ function Conversation({
               src={chatter[0].profileImage.url}
             /> */}
             <div className="flex flex-col justify-center">
+              <div>
               {chatter.map((userDisplayName, index) => (
               <span key={index}>
                 {userDisplayName.userDisplayName}
                 {index < chatter.length - 1 && ", "}
               </span>
             ))}
+            </div>
               <span className="text-sm text-gray-400">
                 {getActiveTime(lastChatterActiveTime)}
               </span>
@@ -192,7 +195,7 @@ function Conversation({
 
         {/* Conversation Messages */}
         <div className="h-full overflow-y-auto flex flex-col justify-end">
-          <div className="px-4 overflow-y-auto flex flex-col justify-end">
+          <div className="px-4 overflow-y-auto flex flex-col">
             {conversationData.map((messageItem, index) => (
               <Message
                 onlyOneMessageInGroup={
@@ -232,7 +235,7 @@ function Conversation({
         </div>
 
         {/* Chat Input */}
-        <ChatInput conversationId={conversationId} />
+        <ChatInput conversationId={conversationId}  />
 
         {/* <Modal
           open={videoCallInfo !== null}
