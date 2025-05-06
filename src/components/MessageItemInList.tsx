@@ -20,6 +20,12 @@ export type MessageItemInListDTO = {
   receivers: UserDTO[];
 };
 
+export type ConversationListWithUserIds = {
+  data: MessageItemInListDTO[];
+  isLastPage: boolean;
+  searchedUsers: UserDTO[];
+};
+
 type MessageItemInListProps = {
   isActive: boolean;
   onCurrentSelectedMessage: (messageId: string) => void;
