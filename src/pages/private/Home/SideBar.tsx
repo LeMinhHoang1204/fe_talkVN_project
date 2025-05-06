@@ -8,7 +8,7 @@ const avatars = [
   { id: 4, imageUrl: "/avatar1.png", groupName: "" },
 ];
 
-const SideBar: React.FC = () => {
+const SideBarNew: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [groupType, setGroupType] = useState("public");
@@ -232,4 +232,4 @@ const SideBar: React.FC = () => {
   );
 };
 
-export default SideBar;
+export default SideBarNew;

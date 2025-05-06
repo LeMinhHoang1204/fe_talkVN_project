@@ -1,6 +1,9 @@
 import { createBrowserRouter, Outlet } from "react-router-dom";
 import { APP_ROUTE } from "../helpers/constants/route.constant";
-import MainLayout from "../layouts/MainLayout";
+import {
+  default as AppLayout,
+  default as MainLayout,
+} from "../layouts/MainLayout";
 import PrivateRoute from "../layouts/PrivateRoute";
 import PublicRoute from "../layouts/PublicRoute";
 import ExplorePage from "../pages/private/ExplorePage/ExplorePage";
@@ -42,6 +45,10 @@ export const router = createBrowserRouter([
           {
             path: APP_ROUTE.MAIN.SEARCH_POST,
             element: <SearchPostPage />,
+          },
+          {
+            path: "/group-chat",
+            element: <AppLayout />,
           },
         ],
       },
