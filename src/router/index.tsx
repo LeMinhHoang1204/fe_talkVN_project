@@ -3,6 +3,7 @@ import { APP_ROUTE } from "../helpers/constants/route.constant";
 import MainLayout from "../layouts/MainLayout";
 import PrivateRoute from "../layouts/PrivateRoute";
 import PublicRoute from "../layouts/PublicRoute";
+import AppLayout from "../MyApp";
 import ExplorePage from "../pages/private/ExplorePage/ExplorePage";
 import SearchPostPage from "../pages/private/ExplorePage/SearchPostPage";
 import Home from "../pages/private/Home/Home";
@@ -23,7 +24,7 @@ export const router = createBrowserRouter([
         element: <MainLayout />,
         children: [
           {
-            index: true,
+            // index: true,
             path: APP_ROUTE.MAIN.HOME,
             element: <HomePage />,
           },
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
           {
             path: APP_ROUTE.MAIN.SEARCH_POST,
             element: <SearchPostPage />,
+          },
+          {
+            path: "/group-chat",
+            element: <AppLayout />,
           },
         ],
       },
