@@ -2,14 +2,13 @@ import { useMemo } from "react";
 import { twMerge } from "tailwind-merge";
 import ImageWithFallback from "../../../components/ImageWithFallback";
 import { GlobalState } from "../../../data/global/global.slice";
-import { formatPostTime } from "../../../helpers/format/date-time.format";
 import { formatMessageDate } from "../../../helpers/format/date-time.format";
 import { useAppSelector } from "../../../hooks/reduxHooks";
 
 
 type MessageProps = {
   message: string;
-  time: number;
+  createTime: number;
   isFirst: boolean;
   isLast: boolean;
   isFromSender: boolean;
@@ -17,9 +16,10 @@ type MessageProps = {
   onlyOneMessageInGroup: boolean;
   chatter: string;
 };
+
 function Message({
   message,
-  time,
+  createTime,
   isFirst,
   isLast,
   isFromSender,
@@ -84,7 +84,7 @@ function Message({
         {(isFirst || onlyOneMessageInGroup) &&
         <div>
           <span className="text-bold font-bold text-white mb-1 mr-2">{chatter}</span>
-          <span className="text-sm text-[#80848E]">{formatMessageDate(time)}</span>
+          <span className="text-sm text-[#80848E]">{formatMessageDate(createTime)}</span>
         </div>}
           
           

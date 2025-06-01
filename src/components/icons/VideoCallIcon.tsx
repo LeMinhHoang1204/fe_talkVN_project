@@ -14,14 +14,14 @@ export const VideoCallIcon = ({ className, ...props }: IconProps) => {
     >
       <path
         d="M31 4L22 11L31 18V4Z"
-        stroke="currentColor"
+        stroke="#71BD7F"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M19.2 1H3.8C2.2536 1 1 2.21523 1 3.71429V17.2857C1 18.7848 2.2536 20 3.8 20H19.2C20.7464 20 22 18.7848 22 17.2857V3.71429C22 2.21523 20.7464 1 19.2 1Z"
-        stroke="currentColor"
+        stroke="#71BD7F"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"

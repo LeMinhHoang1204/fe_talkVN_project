@@ -34,7 +34,8 @@ export const getMessageListDetailDTO = (
   message: {
     messageId: data.id,
     content: data.messageText,
-    time: data.updatedOn,
+    updateTime: data.updatedOn,
+    createTime: data.createdOn,
   },
   conversationId: id,
 });
