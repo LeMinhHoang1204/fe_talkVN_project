@@ -4,8 +4,13 @@ import { RootState } from "../data";
 import { GlobalState } from "../data/global/global.slice";
 import { useAppSelector } from "../hooks/reduxHooks";
 import { EXPANDED_CONTENT_TYPE } from "../types/side-bar.type";
-import SideBar from "./components/SideBar";
+// import SideBar from "./components/SideBar";
 import SideBarExpandedContent from "./components/SideBarExpandedContent";
+import ChannelSidebar from "../pages/private/Home/ChannelSideBar.tsx";
+// import ConversationPage from "../pages/private/Home/ConversatioinPage.tsx";
+// import SideBar from "../pages/private/Home/SideBar.tsx";
+import SideBar from "./components/SideBar";
+
 
 function MainLayout() {
   const { sideBarExpandedContent }: GlobalState = useAppSelector(
@@ -32,6 +37,13 @@ function MainLayout() {
       <AddPostModal />
     </div>
   );
+  // return (
+  //   <div className="flex">
+  //     <div className="w-[5%] bg-[#18092f]"> {/* group bar */}  <SideBar /></div>
+  //     <div className="w-[18%]"> <ChannelSidebar /> </div>
+  //     <div className="flex-1 bg-gray-100"> {/* Nội dung chính */} <ConversationPage/> </div>
+  //   </div>
+  // );
 }
 
 export default MainLayout;

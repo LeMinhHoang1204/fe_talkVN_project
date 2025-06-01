@@ -1,8 +1,6 @@
 import { HubConnection } from "@microsoft/signalr";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { InfoFillIcon } from "../../../components/icons/InfoFillIcon";
-import { PhoneCallOutlineIcon } from "../../../components/icons/PhoneCallOutlineIcon";
-import { VideoCallOutlineIcon } from "../../../components/icons/VideoCallOutlineIcon";
 import ImageWithFallback from "../../../components/ImageWithFallback";
 import { Modal } from "../../../components/Modal";
 import {
@@ -70,7 +68,8 @@ function Conversation({
           message: {
             messageId: newMessage.id,
             content: newMessage.messageText,
-            time: newMessage.createdOn,
+            createTime: newMessage.createdOn,
+            updateTime: newMessage.updatedOn,
           },
         }];
       });
@@ -92,7 +91,8 @@ function Conversation({
           message: {
             messageId: newMessage.id,
             content: newMessage.messageText,
-            time: newMessage.createdOn,
+            createTime: newMessage.createdOn,
+            updateTime: newMessage.updatedOn,
           },
         }];
       });
@@ -143,31 +143,37 @@ function Conversation({
   const [videoCallInfo, setVideoCallInfo] =
     useState<ConversationInformationDTO | null>(null);
 
+  const [isVideoCallActive, setIsVideoCallActive] = useState<boolean>(false);
+
+
   return (
-    <div className="w-full h-full flex flex-row ">
+    <div className="w-full h-full flex flex-row bg-[#313338] text-white">
       <div className="w-full h-full flex flex-col">
         {/* Conversation Header */}
-        <div className="flex flex-row justify-between py-3 px-4 border-b">
-          <div className="flex flex-row gap-2">
-            <ImageWithFallback
+        {/* <div className="flex flex-row justify-between py-3 px-4 border-b-[2px] border-black/50 text-white h-60px"> */}
+        <div className="box-border flex items-center justify-between h-[80px] px-4 py-3 border-b-[2px] border-black/50">
+          <div className="flex flex-row pl-4">
+            {/* <ImageWithFallback
               className="h-12 w-12 rounded-full"
               alt="avatar"
               src={chatter[0].profileImage.url}
-            />
+            /> */}
             <div className="flex flex-col justify-center">
+              <div>
               {chatter.map((userDisplayName, index) => (
               <span key={index}>
                 {userDisplayName.userDisplayName}
                 {index < chatter.length - 1 && ", "}
               </span>
             ))}
-              <span className="text-sm text-gray-500">
+            </div>
+              <span className="text-sm text-gray-400">
                 {getActiveTime(lastChatterActiveTime)}
               </span>
             </div>
           </div>
           <div className="flex flex-row gap-4">
-            <button onClick={() => {}}>
+            {/* <button onClick={() => {}}>
               <PhoneCallOutlineIcon />
             </button>
             <button
@@ -178,7 +184,25 @@ function Conversation({
               }}
             >
               <VideoCallOutlineIcon />
-            </button>
+            </button> */}
+            {/* Setting icon */}
+            <span className="relative group/icon flex items-center">
+            <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 22 22" fill="none">
+            <g clip-path="url(#clip0_146_559)">
+                <path d="M11.1629 13.5958C12.6646 13.5958 13.882 12.3784 13.882 10.8766C13.882 9.37488 12.6646 8.15748 11.1629 8.15748C9.66112 8.15748 8.44372 9.37488 8.44372 10.8766C8.44372 12.3784 9.66112 13.5958 11.1629 13.5958Z" stroke="#DBDEE1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M17.8701 13.5958C17.7495 13.8692 17.7135 14.1724 17.7668 14.4665C17.8201 14.7605 17.9603 15.0318 18.1692 15.2454L18.2236 15.2998C18.3922 15.4682 18.5259 15.6681 18.6171 15.8882C18.7083 16.1082 18.7553 16.3441 18.7553 16.5823C18.7553 16.8206 18.7083 17.0564 18.6171 17.2765C18.5259 17.4966 18.3922 17.6965 18.2236 17.8649C18.0553 18.0334 17.8553 18.1671 17.6353 18.2583C17.4152 18.3496 17.1793 18.3965 16.9411 18.3965C16.7029 18.3965 16.467 18.3496 16.2469 18.2583C16.0268 18.1671 15.8269 18.0334 15.6585 17.8649L15.6042 17.8105C15.3905 17.6015 15.1192 17.4614 14.8252 17.408C14.5312 17.3547 14.2279 17.3907 13.9545 17.5114C13.6865 17.6263 13.4578 17.8171 13.2968 18.0602C13.1357 18.3034 13.0493 18.5884 13.0482 18.88V19.0341C13.0482 19.5149 12.8572 19.976 12.5172 20.3159C12.1772 20.6559 11.7162 20.8469 11.2354 20.8469C10.7546 20.8469 10.2935 20.6559 9.95356 20.3159C9.6136 19.976 9.42261 19.5149 9.42261 19.0341V18.9525C9.41559 18.6525 9.31848 18.3616 9.14391 18.1175C8.96933 17.8734 8.72536 17.6875 8.44372 17.5839C8.17033 17.4632 7.86708 17.4272 7.57305 17.4806C7.27902 17.5339 7.00771 17.674 6.79409 17.883L6.73971 17.9374C6.57135 18.1059 6.37142 18.2396 6.15136 18.3309C5.93129 18.4221 5.6954 18.469 5.45717 18.469C5.21895 18.469 4.98306 18.4221 4.76299 18.3309C4.54292 18.2396 4.34299 18.1059 4.17464 17.9374C4.00609 17.769 3.87238 17.5691 3.78116 17.349C3.68993 17.129 3.64298 16.8931 3.64298 16.6548C3.64298 16.4166 3.68993 16.1807 3.78116 15.9607C3.87238 15.7406 4.00609 15.5407 4.17464 15.3723L4.22902 15.3179C4.43798 15.1043 4.57815 14.833 4.63146 14.539C4.68477 14.2449 4.64878 13.9417 4.52813 13.6683C4.41323 13.4002 4.22245 13.1716 3.97928 13.0105C3.7361 12.8495 3.45115 12.7631 3.15948 12.7619H3.0054C2.52462 12.7619 2.06354 12.5709 1.72358 12.231C1.38361 11.891 1.19263 11.4299 1.19263 10.9491C1.19263 10.4684 1.38361 10.0073 1.72358 9.66732C2.06354 9.32736 2.52462 9.13637 3.0054 9.13637H3.08697C3.38698 9.12935 3.67794 9.03225 3.92203 8.85767C4.16611 8.68309 4.35203 8.43912 4.45562 8.15748C4.57627 7.88409 4.61226 7.58084 4.55895 7.28681C4.50564 6.99278 4.36546 6.72147 4.15651 6.50785L4.10213 6.45347C3.93358 6.28511 3.79987 6.08518 3.70865 5.86512C3.61742 5.64505 3.57046 5.40916 3.57046 5.17093C3.57046 4.93271 3.61742 4.69682 3.70865 4.47675C3.79987 4.25668 3.93358 4.05676 4.10213 3.8884C4.27048 3.71985 4.47041 3.58614 4.69048 3.49492C4.91055 3.40369 5.14644 3.35674 5.38466 3.35674C5.62289 3.35674 5.85878 3.40369 6.07885 3.49492C6.29891 3.58614 6.49884 3.71985 6.6672 3.8884L6.72158 3.94278C6.9352 4.15174 7.20651 4.29191 7.50054 4.34522C7.79457 4.39853 8.09782 4.36254 8.3712 4.24189H8.44372C8.7118 4.12699 8.94043 3.93621 9.10147 3.69304C9.26252 3.44987 9.34894 3.16491 9.3501 2.87325V2.71916C9.3501 2.23838 9.54109 1.7773 9.88105 1.43734C10.221 1.09738 10.6821 0.906387 11.1629 0.906387C11.6437 0.906387 12.1047 1.09738 12.4447 1.43734C12.7847 1.7773 12.9756 2.23838 12.9756 2.71916V2.80073C12.9768 3.0924 13.0632 3.37735 13.2243 3.62053C13.3853 3.8637 13.614 4.05448 13.882 4.16938C14.1554 4.29003 14.4587 4.32602 14.7527 4.27271C15.0467 4.2194 15.318 4.07922 15.5317 3.87027L15.586 3.81589C15.7544 3.64734 15.9543 3.51363 16.1744 3.42241C16.3945 3.33118 16.6303 3.28422 16.8686 3.28422C17.1068 3.28422 17.3427 3.33118 17.5628 3.42241C17.7828 3.51363 17.9828 3.64734 18.1511 3.81589C18.3197 3.98424 18.4534 4.18417 18.5446 4.40424C18.6358 4.62431 18.6828 4.8602 18.6828 5.09842C18.6828 5.33665 18.6358 5.57254 18.5446 5.79261C18.4534 6.01267 18.3197 6.2126 18.1511 6.38096L18.0967 6.43534C17.8878 6.64896 17.7476 6.92027 17.6943 7.2143C17.641 7.50833 17.677 7.81158 17.7976 8.08496V8.15748C17.9125 8.42556 18.1033 8.65419 18.3465 8.81523C18.5896 8.97628 18.8746 9.0627 19.1663 9.06386H19.3203C19.8011 9.06386 20.2622 9.25485 20.6022 9.59481C20.9421 9.93477 21.1331 10.3959 21.1331 10.8766C21.1331 11.3574 20.9421 11.8185 20.6022 12.1585C20.2622 12.4984 19.8011 12.6894 19.3203 12.6894H19.2388C18.9471 12.6906 18.6622 12.777 18.419 12.938C18.1758 13.0991 17.985 13.3277 17.8701 13.5958Z" stroke="#DBDEE1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <defs>
+                <clipPath id="clip0_146_559">
+                <rect width="21.7533" height="21.7533" fill="white" transform="translate(0.286255)"/>
+                </clipPath>
+            </defs>
+            </svg>
+
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 mb-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block" style={{ fontSize: "11px"}}>
+            Cài đặt
+            </div>
+            </span>
 
             <button
               onClick={() => {
@@ -191,8 +215,20 @@ function Conversation({
         </div>
 
         {/* Conversation Messages */}
-        <div className="h-full overflow-y-auto">
-          <div className="px-4 overflow-y-auto flex flex-col justify-end">
+        <div className="h-full overflow-y-auto flex flex-col justify-end">
+          {isVideoCallActive ? (
+            <div className="flex flex-col justify-center items-center h-full">
+              {/* Giao diện video call */}
+              <div className="text-white text-lg font-bold">Video Call Active</div>
+              <button
+                className="mt-4 px-4 py-2 bg-red-600 text-white rounded"
+                onClick={() => setIsVideoCallActive(false)} // Tắt video call
+              >
+                End Call
+              </button>
+            </div>
+          ) : (
+          <div className="px-4 overflow-y-auto flex flex-col">
             {conversationData.map((messageItem, index) => (
               <Message
                 onlyOneMessageInGroup={
@@ -204,6 +240,9 @@ function Conversation({
                       conversationData[index + 1].senderId)
                 }
                 senderAvatarUrl={chatter[0].profileImage.url}
+                chatter={chatter.find(user => user.id === messageItem.senderId)?.userDisplayName ||
+                  (messageItem.senderId === userInfo.userId ? userInfo.username : "Unknown")
+                }
                 isFirst={
                   (index === 0 ||
                     messageItem.senderId !==
@@ -221,15 +260,16 @@ function Conversation({
                 key={messageItem.message.messageId}
                 message={messageItem.message.content}
                 isFromSender={messageItem.senderId !== userInfo.userId}
-                time={messageItem.message.time}
+                createTime={messageItem.message.createTime}
               />
             ))}
             <div ref={lastMessageRef}></div>
           </div>
+          )}
         </div>
 
         {/* Chat Input */}
-        <ChatInput conversationId={conversationId} />
+        <ChatInput conversationId={conversationId}  />
 
         {/* <Modal
           open={videoCallInfo !== null}
