@@ -154,7 +154,7 @@ function MessagesPage({
                 className="text-blue-400"
                 username={`@${userInfo.username}`}
               />
-            </div>
+            </div> 
 
             {/* Tim chat */}
             <input
