@@ -9,7 +9,7 @@ function AppLayout() {
       {/* <div className="w-[6%] bg-[#18092f]">
         <SideBar />
       </div> */}
-      <div className="w-[18%] bg-[#2b2d31]">
+      <div className="w-[20%] bg-[#2b2d31]">
         <ChannelSidebar />
       </div>
       <div className="flex-1 relative bg-gray-100">
