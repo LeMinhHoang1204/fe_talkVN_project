@@ -15,11 +15,23 @@ import {
 } from "../../../data/conversation/conversation.api";
 import { GlobalState } from "../../../data/global/global.slice";
 import { socketBaseUrl } from "../../../helpers/constants/configs.constant";
+import { WEB_SOCKET_EVENT } from "../../../helpers/constants/websocket-event.constant";
 import { useAppSelector } from "../../../hooks/reduxHooks";
-import { UserDTO } from "../../../types/data.type";
+import {
+  UserDTO
+} from "../../../types/data.type";
 import Conversation from "../components/Conversation";
 
-function MessagesPage() {
+type ConversationProps = {
+  conversationId: string;
+  chatter: UserDTO[];
+  lastChatterActiveTime: number;
+  connection: HubConnection | null;
+};
+
+function MessagesPage({
+  conversationId,
+}: ConversationProps) {
   const { userInfo }: GlobalState = useAppSelector((state) => state.global);
 
   const { data: messageListData } = useGetConversationListQuery({
@@ -40,6 +52,9 @@ function MessagesPage() {
   const [searchResult, setSearchResult] = useState<MessageItemInListDTO[] | null>(null);
   const messagesToRender = searchResult ?? messageListData?.data ?? [];
   
+  function autoCaplock(str: string): string {
+    return str.toUpperCase();
+  }
   useEffect(() => {
     const setupSignalR = async () => {
       const newConnection = new HubConnectionBuilder()
@@ -71,18 +86,13 @@ function MessagesPage() {
   }, []);
 
   return (
-    <div className="flex flex-row w-full h-full bg-[#2B2D31]">
-      <div className="w-300px flex flex-col md:w-[420px] h-full overflow-auto">
-        <div className="w-full h-60px">
-            <div
-                className="flex justify-end items-start border-b-[2px] border-black/50"
-                style={{
-                    padding: "19px 0px",
-                }}
-            >
-                <span className="font-bold text-white flex justify-center items-center w-full">groupName</span>
-            </div>
-        </div>
+    <div className="flex flex-row w-300px h-full bg-[#2B2D31]">
+      <div className="flex flex-col md:w-[310px] h-full overflow-auto">
+        {/* <div className="flex justify-end items-start px-4 h-60px border-b-[2px] border-black/50 w-full"> */}
+          <div className="box-border flex items-center justify-between h-[70px] px-4 py-3 border-b-[2px] border-black/50">
+
+              <span className="font-bold text-white flex justify-center items-center w-full">groupName</span>
+          </div>
 
 
         {/* Search */}
@@ -210,45 +220,117 @@ function MessagesPage() {
             <OpenSendNewMessageOutlineIcon />
           </button> */}
         {/* </div> */}
+      <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
+        <div className="font-bold px-4 pt-2">{autoCaplock('Channels')}</div>
+      </div>
+
+      {/* A message is a conversation */}
+      <div className="flex flex-col mx-3">
+        {messagesToRender.map((message) => (
+          <MessageItemInList
+            connection={connection}
+            onCurrentSelectedMessage={() => setSelectedMessageId(message.messageId)}
+            setChatter={setChatter}
+            isActive={selectedMessageId === message.messageId}
+            key={message.messageId}
+            messageItemData={message}
+          />
+        ))}
+        {messagesToRender.length === 0 && (
+          // <></>}
+          <div className="h-full flex flex-col justify-center items-center">
+            {/* <ImageWithFallback
+            className="h-24 w-24"
+            src="/assets/images/empty-message.svg"
+            alt="empty-message"
+          /> */}
+            {
+              "No messages yet. Start a conversation by sending a message to someone."
+            }
+          </div>
+        )}
+
         <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
-          <div className="font-bold px-4">Channels</div>
+          <div className="font-bold px-4 pt-2">{autoCaplock('Video channel')}</div>
         </div>
 
-        {/* A message is a conversation */}
-        <div className="flex flex-col mx-3">
-          {messagesToRender.map((message) => (
-            <MessageItemInList
-              connection={connection}
-              onCurrentSelectedMessage={() => setSelectedMessageId(message.messageId)}
-              setChatter={setChatter}
-              isActive={selectedMessageId === message.messageId}
-              key={message.messageId}
-              messageItemData={message}
-            />
-          ))}
-          {messagesToRender.length === 0 && (
-            // <></>}
-            <div className="h-full flex flex-col justify-center items-center">
-              {/* <ImageWithFallback
-              className="h-24 w-24"
-              src="/assets/images/empty-message.svg"
-              alt="empty-message"
-            /> */}
-              {
-                "No messages yet. Start a conversation by sending a message to someone."
-              }
+        <button
+          onClick={() => {
+            const videoCallUrl = `/video/${conversationId}`;
+            window.open(videoCallUrl, "_blank", "width=800,height=600");
+            connection?.invoke(WEB_SOCKET_EVENT.START_CALL, conversationId);
+          }}
+        >
+          <div className="flex-col">
+          <div
+            className="text-[#80848E] group flex items-center relative mt-2 ml-[10px] p-[2px] cursor-pointer hover:bg-[#3A3C40] hover:text-[#DBDEE1] rounded-[4px] transition duration-200 ease-in-out"
+          
+            // className="text-[#80848E] group flex items-center relative mt-2 ml-[10px] p-[2px] cursor-pointer hover:bg-[#3A3C40] hover:text-[#DBDEE1] rounded-[4px] transition duration-200 ease-in-out"
+              style={{
+                  fontSize: "16px",
+                  fontWeight: 600,
+              }}
+          >
+            {/* Icon loa */}
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none" className="mr-2">
+              <path d="M17.2848 4.59186C18.984 6.29158 19.9386 8.5966 19.9386 11C19.9386 13.4034 18.984 15.7084 17.2848 17.4082M14.0852 7.7914C14.9348 8.64126 15.4121 9.79377 15.4121 10.9955C15.4121 12.1972 14.9348 13.3497 14.0852 14.1996M9.97025 4.65531L5.43832 8.28085H1.81277V13.7192H5.43832L9.97025 17.3447V4.65531Z" 
+              stroke="#F5F5F5" stroke-opacity="0.4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+
+            Video channel 1
+          </div>
+
+
+          {/* <div
+            className={twMerge(
+              "text-sm flex flex-row gap-1",
+              !messageItemData.isRead && "font-semibold text-gray-900"
+            )}
+          >
+            {messageItemData.fromMe && (
+              <div
+                className={twMerge(
+                  "text-gray-400",
+                  !messageItemData.isRead && "text-gray-900 font-semibold"
+                )}
+              >
+                You:{" "}
+              </div>
+            )}
+            <div
+              className={twMerge(
+                !messageItemData.isRead && "text-gray-900 font-semibold"
+              )}
+            >
+              {messageItemData.latestMessage}
             </div>
-          )}
+            <div
+              className={twMerge(
+                "text-gray-500 ml-2 text-sm text-nowrap",
+                !messageItemData.isRead && "text-gray-900 font-semibold"
+              )}
+            >
+              • {formatPostTime(messageItemData.time)}
+            </div>
+          </div> */}
+        </div>
+        </button>
+
+                    
         </div>
       </div>
-      {chatter && (
-        <Conversation
-          connection={connection}
-          lastChatterActiveTime={Date.now()}
-          chatter={chatter}
-          conversationId={selectedMessageId}
-        />
-      )}
+      <div className="w-[1130px]">
+        {chatter && (
+          <Conversation
+            connection={connection}
+            lastChatterActiveTime={Date.now()}
+            chatter={chatter}
+            conversationId={selectedMessageId}
+          />
+        )}
+      </div>
+      
+      
     </div>
   );
 }
