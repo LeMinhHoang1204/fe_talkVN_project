@@ -3,16 +3,17 @@ import { APP_ROUTE } from "../helpers/constants/route.constant";
 import MainLayout from "../layouts/MainLayout";
 import PrivateRoute from "../layouts/PrivateRoute";
 import PublicRoute from "../layouts/PublicRoute";
+import AppLayout from "../MyApp";
 import ExplorePage from "../pages/private/ExplorePage/ExplorePage";
 import SearchPostPage from "../pages/private/ExplorePage/SearchPostPage";
-// import MessagesPage from "../pages/private/Home/ConversatioinPage";
-import MessagesPage from "../pages/private/MessagePage/MessagesPage.tsx";
+import Home from "../pages/private/Home/Home";
 import HomePage from "../pages/private/HomePage/HomePage";
+import MessagesPage from "../pages/private/MessagePage/MessagesPage";
 import ProfilePage from "../pages/private/ProfilePage/ProfilePage";
 import VideoCall from "../pages/private/VideoCall/VideoCall";
+import GoogleCallbackPage from "../pages/public/GoogleCallbackPage";
 import LoginPage from "../pages/public/LoginPage";
 import SignUpPage from "../pages/public/SignUpPage";
-import GoogleCallbackPage from "../pages/public/GoogleCallbackPage";
 
 export const router = createBrowserRouter([
   {
@@ -23,7 +24,7 @@ export const router = createBrowserRouter([
         element: <MainLayout />,
         children: [
           {
-            index: true,
+            // index: true,
             path: APP_ROUTE.MAIN.HOME,
             element: <HomePage />,
           },
@@ -43,6 +44,10 @@ export const router = createBrowserRouter([
             path: APP_ROUTE.MAIN.SEARCH_POST,
             element: <SearchPostPage />,
           },
+          {
+            path: "/group-chat",
+            element: <AppLayout />,
+          },
         ],
       },
       {
@@ -58,6 +63,10 @@ export const router = createBrowserRouter([
         path: "/",
         element: <Outlet />,
         children: [
+          {
+            index: true,
+            element: <Home />,
+          },
           {
             path: APP_ROUTE.AUTH.LOGIN,
             element: <LoginPage />,

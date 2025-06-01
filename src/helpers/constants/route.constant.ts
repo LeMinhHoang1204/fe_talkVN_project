@@ -12,7 +12,7 @@ export const APP_ROUTE = {
   },
   MAIN: {
     self: ROUTE_NAME.MAIN,
-    HOME: `${ROUTE_NAME.MAIN}`,
+    HOME: `${ROUTE_NAME.MAIN}/home`,
     EXPLORE: `${ROUTE_NAME.MAIN}/explore`,
     MESSAGES: `${ROUTE_NAME.MAIN}/messages`,
     PROFILE: (id: string) => `${ROUTE_NAME.MAIN}/profile/${id}`,

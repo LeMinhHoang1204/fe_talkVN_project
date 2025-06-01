@@ -1,7 +1,7 @@
 import { enqueueSnackbar } from "notistack";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import ImageWithFallback from "../../components/ImageWithFallback";
+// import ImageWithFallback from "../../components/ImageWithFallback";
 import { useLoginMutation } from "../../data/auth/auth.api";
 import { loginThunk } from "../../data/auth/auth.thunk";
 import { apiBaseUrl } from "../../helpers/constants/configs.constant";
@@ -50,87 +50,105 @@ function LoginPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex h-full w-full gap-8 flex-row flex-wrap justify-center items-center">
-      <ImageWithFallback
-        className="h-96"
-        alt=""
-        src="../login-iphone-frame.png"
-      />
-      <FormProvider {...formMethods}>
-        <form
-          className="flex border py-16 px-8 flex-col gap-4 w-full max-w-[300px]"
-          onSubmit={handleSubmit(onLogin)}
+    <div className="relative min-h-screen w-full overflow-hidden">
+      <video
+        className="absolute top-0 left-0 w-full h-full object-cover -z-10"
+        autoPlay
+        loop
+        muted
+        playsInline
+      >
+        <source src="/video/backgroud_home.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
+      <div className="absolute inset-0 bg-[#3F2B6A] bg-opacity-70 z-0"></div>
+
+      <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
+        <div
+          className="bg-white bg-opacity-80 rounded-[40px] p-10 shadow-2xl max-w-md w-full"
+          style={{ width: "450px" }}
         >
-          <ImageWithFallback
-            className="w-48 self-center"
-            src="/ChitChatLong.svg"
-            alt="ChitChat"
-          />
-          <div className="w-full px-3 text-xs py-2 focus:outline-none bg-gray-100 border border-gray-300 rounded-md">
-            <Controller
-              control={control}
-              name="userName"
-              render={({ field }) => (
-                <input
-                  {...field}
-                  autoComplete="off"
-                  className="focus:outline-none bg-transparent w-full"
-                  placeholder="Enter your username, phone or email"
-                />
-              )}
-            />
-          </div>
-          <div className="w-full px-3 text-xs py-2 focus:outline-none bg-gray-100 border border-gray-300 rounded-md">
-            <Controller
-              control={control}
-              name="password"
-              render={({ field }) => (
-                <input
-                  {...field}
-                  className="focus:outline-none bg-transparent w-full"
-                  placeholder="Enter your password"
-                  type="password"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSubmit(onLogin)();
-                    }
+          <h1
+            className="text-5xl font-bold text-center text-[#3F2B6A] mb-8 cursor-pointer"
+            onClick={() => navigate("/")}
+          >
+            TalkVN
+          </h1>
+          <FormProvider {...formMethods}>
+            <form onSubmit={handleSubmit(onLogin)} className="space-y-6">
+              <Controller
+                control={control}
+                name="userName"
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    autoComplete="off"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-700"
+                    placeholder="Enter your username"
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="password"
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-700"
+                    placeholder="Enter your password"
+                    type="password"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSubmit(onLogin)();
+                      }
+                    }}
+                  />
+                )}
+              />
+
+              <button
+                type="submit"
+                disabled={isLoginLoading}
+                onClick={handleSubmit(onLogin)}
+                className="w-full bg-purple-800 text-white py-3 rounded-xl hover:bg-purple-900 transition"
+              >
+                Login
+              </button>
+              {/* <p className="text-center text-sm text-gray-700"> Or </p> */}
+              <button
+                type="button"
+                onClick={onLoginByGoogle}
+                className="w-full flex items-center justify-center gap-3 border border-gray-400 text-gray-700 py-3 rounded-xl hover:bg-gray-100 transition"
+              >
+                {/* <img src="/icon_google.jpg" alt="Google" className="w-5 h-5" /> */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 488 512"
+                  className="w-5 h-5"
+                >
+                  <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
+                </svg>
+                Sign in with Google
+              </button>
+
+              <p className="text-center text-sm text-gray-700 mt-6">
+                Don't have an account?{" "}
+                <button
+                  onClick={() => {
+                    navigate(APP_ROUTE.AUTH.SIGNUP);
                   }}
-                />
-              )}
-            />
-          </div>
-
-          <button
-            disabled={isLoginLoading}
-            onClick={handleSubmit(onLogin)}
-            className="px-4 text-xs font-semibold text-white py-2 bg-[#4BB4F8] rounded-md"
-          >
-            Login
-          </button>
-
-          <button
-            type="button"  
-            onClick={onLoginByGoogle}
-            className="px-4 text-xs font-semibold text-white py-2 bg-[#4BB4F8] rounded-md"
-          >
-            Login by Google
-          </button>
-
-          <div className="text-xs text-gray-500 flex flex-row justify-center gap-2">
-            Don't have an account?{" "}
-            <button
-              onClick={() => {
-                navigate(APP_ROUTE.AUTH.SIGNUP);
-              }}
-              className="text-[#4BB4F8] text-xs font-medium "
-            >
-              Sign up
-            </button>
-          </div>
-        </form>
-      </FormProvider>
+                  className="text-[#4BB4F8] text-xs font-medium "
+                >
+                  Sign up
+                </button>
+              </p>
+            </form>
+          </FormProvider>
+        </div>
+      </div>
     </div>
   );
 }
-
 export default LoginPage;
