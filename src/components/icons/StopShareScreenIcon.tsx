@@ -19,19 +19,19 @@ export const StopShareScreenIcon = ({ className, ...props }: IconProps) => {
         height="23"
         rx="3.5"
         fill="none"
-        stroke="currentColor"
+        stroke="#71BD7F"
         stroke-width="3"
       />
       <path
         d="M20 17L13 9"
-        stroke="currentColor"
+        stroke="#71BD7F"
         stroke-width="3"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M20 9L13 17"
-        stroke="currentColor"
+        stroke="#71BD7F"
         stroke-width="3"
         stroke-linecap="round"
         stroke-linejoin="round"

@@ -16,6 +16,7 @@ import { VideoCallIcon } from "../../../components/icons/VideoCallIcon";
 import { VideoCallMuteIcon } from "../../../components/icons/VideoCallMuteIcon";
 import { socketBaseUrl } from "../../../helpers/constants/configs.constant";
 import { WEB_SOCKET_EVENT } from "../../../helpers/constants/websocket-event.constant";
+import { UserInCallIcon } from "../../../components/icons/UserInCall";
 
 const VideoCall: React.FC = () => {
   const { conversationId } = useParams<{ conversationId: string }>();
@@ -314,7 +315,7 @@ const VideoCall: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-black">
       <div className="flex max-w-7xl w-full gap-4 mt-4">
         <div className="flex flex-1 flex-col justify-center items-center gap-4">
           <video
@@ -322,7 +323,7 @@ const VideoCall: React.FC = () => {
             autoPlay
             muted
             className={twMerge(
-              "w-full rounded-xl bg-black",
+              "w-full rounded-xl bg-gray-300",
               isCameraOn && "border-2 border-green-600"
             )}
             style={{
@@ -339,37 +340,43 @@ const VideoCall: React.FC = () => {
             }}
             ref={remoteVideoRef}
             autoPlay
-            className="border border-gray-300 w-full rounded-xl bg-black"
+            className="border border-gray-300 w-full rounded-xl bg-gray-300"
           />
           <h3>Remote Video</h3>
         </div>
       </div>
       <div className="flex gap-4 mt-4 fixed bottom-8">
         <button
-          className="w-16 h-16 rounded-full flex justify-center items-center shadow-circleButton"
+          className="w-10 h-10 rounded-[8px] bg-[#2A2E31] flex justify-center items-center shadow-circleButton"
           onClick={toggleMute}
         >
           {isMuted ? <MicrophoneMutedIcon /> : <MicrophoneIcon />}
         </button>
 
         <button
-          className="w-16 h-16 rounded-full flex justify-center items-center shadow-circleButton"
+          className="w-10 h-10 rounded-[8px] bg-[#2A2E31] flex justify-center items-center shadow-circleButton"
           onClick={toggleShareScreen}
         >
           {isScreenSharing ? <StopShareScreenIcon /> : <ShareScreenIcon />}
         </button>
 
         <button
-          className="w-16 h-16 rounded-full flex justify-center items-center shadow-circleButton"
+          className="w-10 h-10 rounded-[8px] bg-[#2A2E31] flex justify-center items-center shadow-circleButton"
           onClick={toggleCamera}
         >
           {isCameraOn ? <VideoCallIcon /> : <VideoCallMuteIcon />}
         </button>
         <button
+          className="w-10 h-10 rounded-[8px] bg-[#2A2E31] flex justify-center items-center shadow-circleButton"
+          // onClick={() => {}
+        >
+          <UserInCallIcon />
+        </button>
+        <button
           onClick={() => {
             window.close();
           }}
-          className="w-16 h-16 rounded-full flex justify-center items-center bg-red-700 shadow-circleButton"
+          className="w-10 h-10 rounded-[8px] bg-red-700 flex justify-center items-center shadow-circleButton"
         >
           <EndCallIcon className="text-white h-24 w-24" />
         </button>

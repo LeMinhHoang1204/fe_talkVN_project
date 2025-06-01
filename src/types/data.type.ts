@@ -41,7 +41,8 @@ export type UserDTO = {
 export type MessageDTO = {
   messageId: string;
   content: string;
-  time: number;
+  updateTime: number;
+  createTime: number;
 };
 
 export type ConversationDTO = {

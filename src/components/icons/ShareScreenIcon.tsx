@@ -18,19 +18,19 @@ export const ShareScreenIcon = ({ className, ...props }: IconProps) => {
         width="31"
         height="23"
         rx="3.5"
-        stroke="currentColor"
+        stroke="white"
         stroke-width="3"
       />
       <path
         d="M17 17V9"
-        stroke="currentColor"
+        stroke="white"
         stroke-width="3"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M12 14L17.5 9L23 14"
-        stroke="currentColor"
+        stroke="white"
         stroke-width="3"
         stroke-linecap="round"
         stroke-linejoin="round"

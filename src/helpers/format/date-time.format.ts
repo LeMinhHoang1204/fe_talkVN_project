@@ -66,3 +66,16 @@ export const getActiveTime = (timestamp: Timestamp): string => {
     return `Last active ${postTime.format("YYYY.MM.DD")}`;
   }
 };
+
+export const formatMessageDate = (timestamp: Timestamp): string => {
+  if (typeof timestamp === "string") {
+    timestamp = parseInt(timestamp, 10);
+  } else if (timestamp instanceof Date) {
+    timestamp = Math.floor(timestamp.getTime() / 1000); // Convert Date to Unix timestamp in seconds
+  }
+  const date = dayjs(timestamp * 1000); // Convert seconds to milliseconds for dayjs
+  if (!date.isValid()) {
+    throw new Error("Invalid timestamp");
+  }
+  return date.format("DD MMMM YYYY HH:mm");
+};
