@@ -101,3 +101,16 @@ export type ConversationInformationDTO = {
   conversationId: string;
   chatter: UserDTO[];
 };
+
+export type GroupDTO = {
+  userId: string;
+  user: {
+    id: string;
+    displayName: string;
+    avatarUrl: string;
+  };
+  groupId: string;
+  roleId: string;
+  acceptedBy: string;
+  invitedBy: string;
+};
