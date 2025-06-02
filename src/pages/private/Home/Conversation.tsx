@@ -192,74 +192,74 @@ function Conversation({
             {/* Hiển thị các tin nhắn giả nếu có */}
             {mockMessages?.map((msg, idx) => (
               <div
-          key={`mock-${idx}`}
-          className={`mb-2 flex items-start gap-2 mt-2 ${
-            msg.fromMe ? "justify-end" : ""
-          }`}
+                key={`mock-${idx}`}
+                className={`mb-2 flex items-start gap-2 mt-2 ${
+                  msg.fromMe ? "justify-end" : ""
+                }`}
               >
-          {!msg.fromMe && (
-            <ImageWithFallback
-              className="h-8 w-8 rounded-full"
-              alt="avatar"
-              src={chatter.profileImage.url}
-            />
-          )}
-          <div
-            className={`${
-              msg.fromMe ? "text-white p-2 max-w-xs" : "text-left"
-            }`}
-          >
-            {!msg.fromMe && (
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-white">
-            {msg.senderUsername}
-                </span>
-                <span className="text-xs text-[#80848E]">
-            {new Date(msg.time).toLocaleTimeString()}
-                </span>
-              </div>
-            )}
-            <div>
-              {msg.fromMe && (
-                <span className="text-xs text-[#80848E]">
-            {new Date(msg.time).toLocaleTimeString()}
-                </span>
-              )}
-            </div>
-            <div className="text-sm">{msg.content}</div>
-          </div>
+                {!msg.fromMe && (
+                  <ImageWithFallback
+                    className="h-8 w-8 rounded-full"
+                    alt="avatar"
+                    src={chatter.profileImage.url}
+                  />
+                )}
+                <div
+                  className={`${
+                    msg.fromMe ? "text-white p-2 max-w-xs" : "text-left"
+                  }`}
+                >
+                  {!msg.fromMe && (
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-white">
+                        {msg.senderUsername}
+                      </span>
+                      <span className="text-xs text-[#80848E]">
+                        {new Date(msg.time).toLocaleTimeString()}
+                      </span>
+                    </div>
+                  )}
+                  <div>
+                    {msg.fromMe && (
+                      <span className="text-xs text-[#80848E]">
+                        {new Date(msg.time).toLocaleTimeString()}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-sm">{msg.content}</div>
+                </div>
               </div>
             ))}
 
             {conversationData.map((messageItem, index) => (
               <Message
-          onlyOneMessageInGroup={
-            (index === 0 ||
-              messageItem.senderId !==
-                conversationData[index - 1].senderId) &&
-            (index === conversationData.length - 1 ||
-              messageItem.senderId !==
-                conversationData[index + 1].senderId)
-          }
-          senderAvatarUrl={chatter.profileImage.url}
-          isFirst={
-            (index === 0 ||
-              messageItem.senderId !==
-                conversationData[index - 1].senderId) &&
-            index < conversationData.length - 1 &&
-            messageItem.senderId === conversationData[index + 1].senderId
-          }
-          isLast={
-            (index === conversationData.length - 1 ||
-              messageItem.senderId !==
-                conversationData[index + 1].senderId) &&
-            index > 0 &&
-            messageItem.senderId === conversationData[index - 1].senderId
-          }
-          key={messageItem.message.messageId}
-          message={messageItem.message.content}
-          isFromSender={messageItem.senderId !== userInfo.userId}
-          time={messageItem.message.time}
+                onlyOneMessageInGroup={
+                  (index === 0 ||
+                    messageItem.senderId !==
+                      conversationData[index - 1].senderId) &&
+                  (index === conversationData.length - 1 ||
+                    messageItem.senderId !==
+                      conversationData[index + 1].senderId)
+                }
+                senderAvatarUrl={chatter.profileImage.url}
+                isFirst={
+                  (index === 0 ||
+                    messageItem.senderId !==
+                      conversationData[index - 1].senderId) &&
+                  index < conversationData.length - 1 &&
+                  messageItem.senderId === conversationData[index + 1].senderId
+                }
+                isLast={
+                  (index === conversationData.length - 1 ||
+                    messageItem.senderId !==
+                      conversationData[index + 1].senderId) &&
+                  index > 0 &&
+                  messageItem.senderId === conversationData[index - 1].senderId
+                }
+                key={messageItem.message.messageId}
+                message={messageItem.message.content}
+                isFromSender={messageItem.senderId !== userInfo.userId}
+                time={messageItem.message.time}
               />
             ))}
             <div ref={lastMessageRef}></div>
