@@ -6,6 +6,7 @@ import {
   GlobalState,
   setSideBarExpandedContent,
 } from "../../data/global/global.slice";
+import { getAllGroup } from "../../data/group/group.api";
 import { APP_ROUTE } from "../../helpers/constants/route.constant";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { useBreakpoint } from "../../hooks/useBreakPoint";
@@ -18,13 +19,6 @@ import {
   usePostGroupMutation,
 } from "../../data/group/group.api";
 
-const mockGroups = [
-  { id: 1, imageUrl: "/avatar2.png", groupName: "Group 1" },
-  { id: 2, imageUrl: "/avatar3.png", groupName: "Group 2" },
-  { id: 3, imageUrl: "/avatar4.png", groupName: "Group 3" },
-  { id: 4, imageUrl: "/avatar1.png", groupName: "Group 4" },
-];
-
 function SideBar() {
   const { data: DATA_GROUP, refetch } = useGetGroupListQuery();
   console.log("DATA_GROUP", DATA_GROUP);
@@ -35,6 +29,7 @@ function SideBar() {
   const [showCreateGroupModal, setShowCreateGroupModal] =
     useState<boolean>(false);
   const [groupType, setGroupType] = useState<"public" | "private">("public");
+  const [groups, setGroups] = useState<any[]>([]);
 
   const dispatch = useAppDispatch();
 
@@ -138,6 +133,14 @@ function SideBar() {
     }
   }, [dispatch, userInfo?.userId]);
 
+  useEffect(() => {
+    async function fetchGroups() {
+      const res = await getAllGroup(0, 12);
+      setGroups(res.groups || []);
+    }
+    fetchGroups();
+  }, []);
+
   return (
     <div className="bg-[#18092f] flex flex-col items-center justify-between h-screen py-4">
       {/* Top: Logo và Group Avatars */}
@@ -160,11 +163,19 @@ function SideBar() {
             />
           </svg>
         </button>
+<<<<<<< HEAD
         {/* Nhóm với ảnh avatar ngẫu nhiên */}
         {DATA_GROUP?.map((group: any) => (
           <img
             key={group.id}
             src={group.avatar}
+=======
+        {/* Danh sách group thật */}
+        {groups.map((group) => (
+          <img
+            key={group.id}
+            src={group.avatar || "/default-avatar.png"}
+>>>>>>> 138d8a10853e7030f3e658a49174cd1342b0703f
             alt={group.name}
             className="w-10 h-10 rounded-full border-2 border-white cursor-pointer hover:opacity-80"
             title={group.name}

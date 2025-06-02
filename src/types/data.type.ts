@@ -102,6 +102,7 @@ export type ConversationInformationDTO = {
   chatter: UserDTO[];
 };
 
+<<<<<<< HEAD
 export interface GroupDTO {
   id: string;
   name: string;
@@ -111,10 +112,16 @@ export interface GroupDTO {
   status: number;
   maxQuantity: number;
   creator: {
+=======
+export type GroupDTO = {
+  userId: string;
+  user: {
+>>>>>>> 138d8a10853e7030f3e658a49174cd1342b0703f
     id: string;
     displayName: string;
     avatarUrl: string;
   };
+<<<<<<< HEAD
   createdOn: string;
   updatedOn: string;
 }
@@ -126,3 +133,10 @@ export interface CreateGroupDTO {
   description?: string;
   maxQuantity?: number;
 }
+=======
+  groupId: string;
+  roleId: string;
+  acceptedBy: string;
+  invitedBy: string;
+};
+>>>>>>> 138d8a10853e7030f3e658a49174cd1342b0703f
