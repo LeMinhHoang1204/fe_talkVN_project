@@ -6,6 +6,7 @@ import {
 } from "@microsoft/signalr";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import MessageItemInList, {
   MessageItemInListDTO,
 } from "../../../components/MessageItemInList";
@@ -24,18 +25,21 @@ import { UserDTO } from "../../../types/data.type";
 import Conversation from "../components/Conversation";
 
 type ConversationProps = {
-  conversationId: string;
-  chatter: UserDTO[];
-  lastChatterActiveTime: number;
-  connection: HubConnection | null;
+  conversationId?: string;
+  chatter?: UserDTO[];
+  lastChatterActiveTime?: number;
+  connection?: HubConnection | null;
 };
 
-function MessagesPage({ conversationId }: ConversationProps) {
+function MessagesPage({ ...props }: ConversationProps) {
   const { userInfo }: GlobalState = useAppSelector((state) => state.global);
+  const { groupId } = useParams();
+  const isGroupChat = !!groupId;
 
   const { data: messageListData, refetch } = useGetConversationListQuery({
     PageIndex: 1,
     PageSize: GET_CONVERSATION_LIST_PAGE_SIZE,
+    endpoint: isGroupChat ? `/Group/${groupId}/get-all-text-chats` : undefined
   });
 
   const [chatter, setChatter] = useState<UserDTO[]>();
@@ -149,7 +153,7 @@ function MessagesPage({ conversationId }: ConversationProps) {
       <div className="flex flex-col md:w-[310px] h-full overflow-auto">
         <div className="box-border flex items-center justify-between h-[70px] px-4 py-3 border-b-[2px] border-black/50">
           <span className="font-bold text-white flex justify-center items-center w-full">
-            groupName
+            {isGroupChat ? "Group Chat" : "Messages"}
           </span>
         </div>
 
@@ -226,9 +230,9 @@ function MessagesPage({ conversationId }: ConversationProps) {
 
           <button
             onClick={() => {
-              const videoCallUrl = `/video/${conversationId}`;
+              const videoCallUrl = `/video/${props?.conversationId}`;
               window.open(videoCallUrl, "_blank", "width=800,height=600");
-              connection?.invoke(WEB_SOCKET_EVENT.START_CALL, conversationId);
+              connection?.invoke(WEB_SOCKET_EVENT.START_CALL, props?.conversationId);
             }}
           >
             <div className="flex-col">

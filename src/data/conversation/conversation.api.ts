@@ -35,9 +35,13 @@ const conversationApi = usersApi.injectEndpoints({
       GetConversationListItemREQ
     >({
       query: (params) => ({
-        url: `/Conversation`,
+        url: params.endpoint || `/Conversation`,
         method: HTTP_METHOD.GET,
-        params,
+        params: {
+          PageIndex: params.PageIndex,
+          PageSize: params.PageSize,
+          usernames: params.usernames,
+        },
       }),
       transformResponse: (
         response: BaseResponse<GetConversationListItemRES[]>

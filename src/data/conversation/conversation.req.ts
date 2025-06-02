@@ -1,7 +1,9 @@
-import { PaginationREQ } from "../../types/data.type";
 
-export type GetConversationListItemREQ = PaginationREQ & {
+export type GetConversationListItemREQ = {
+  PageIndex?: number;
+  PageSize?: number;
   usernames?: string[];
+  endpoint?: string;
 };
 
 export type GetConversationListREQ = {
