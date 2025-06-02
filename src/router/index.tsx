@@ -37,6 +37,10 @@ export const router = createBrowserRouter([
             element: <MessagesPage />,
           },
           {
+            path: "/group/:groupId",
+            element: <MessagesPage />,
+          },
+          {
             path: APP_ROUTE.MAIN.PROFILE(":id"),
             element: <ProfilePage />,
           },

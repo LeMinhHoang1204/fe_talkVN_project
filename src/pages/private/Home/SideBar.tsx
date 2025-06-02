@@ -21,6 +21,8 @@ const SideBarNew: React.FC = () => {
     console.log("Logged out");
   };
 
+  // console.log("check side bar");
+
   return (
     <div className="flex flex-col items-center justify-between h-screen py-4 bg-[#18092f]">
       {/* Top group: logo + avatars */}

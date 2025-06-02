@@ -1,27 +1,45 @@
-export type getAllGroupResponse = {
-    succeeded: boolean;
-    result: Array<{
+export interface CreateGroupRequest {
+    name: string;
+    description: string;
+    isPrivate: boolean;
+    maxQuantity: number;
+    password?: string;
+}
+
+export interface GroupData {
+    id: string;
+    name: string;
+    isPrivate: boolean;
+    avatar?: string;
+    url?: string;
+    description?: string;
+    maxQuantity: number;
+    creator: {
         id: string;
-        name: string;
-        isPrivate: boolean;
-        avatar: string;
-        url: string;
-        description: string;
-        status: number;
-        maxQuantity: number;
-        creator: {
-            id: string;
-            displayName: string;
-            avatarUrl: string;
-        };
-        createdOn: string;
-        updatedOn: string;
-    }>;
-    errors: Array<{
+    };
+    displayName?: string;
+    avatarUrl?: string;
+    createdOn: string;
+    updatedOn: string;
+}
+
+export interface getAllGroupResponse {
+    succeeded: boolean;
+    result: GroupData[];
+    errors?: Array<{
         code: string;
         message: string;
     }>;
-};
+}
+
+export interface BaseResponse<T> {
+    succeeded: boolean;
+    result: T;
+    errors?: Array<{
+        code: string;
+        message: string;
+    }>;
+}
 
 export type createGroupResponse = {
     succeeded: boolean;
