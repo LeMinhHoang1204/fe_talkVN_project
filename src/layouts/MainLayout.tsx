@@ -37,13 +37,6 @@ function MainLayout() {
       <AddPostModal />
     </div>
   );
-  // return (
-  //   <div className="flex">
-  //     <div className="w-[5%] bg-[#18092f]"> {/* group bar */}  <SideBar /></div>
-  //     <div className="w-[18%]"> <ChannelSidebar /> </div>
-  //     <div className="flex-1 bg-gray-100"> {/* Nội dung chính */} <ConversationPage/> </div>
-  //   </div>
-  // );
 }
 
 export default MainLayout;
