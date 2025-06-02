@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const generateMembers = () => [
+export const generateMembers = () => [
   {
     id: 0,
     name: "KeThongTriLoaiBo",
@@ -18,6 +18,14 @@ const generateMembers = () => [
     isAdmin: false,
   })),
 ];
+export interface Member {
+  id: number;
+  name: string;
+  avatar: string;
+  email: string;
+  phone: string;
+  isAdmin: boolean;
+}
 
 const RightSidebarGrChat: React.FC = () => {
   const members = generateMembers();
@@ -25,15 +33,6 @@ const RightSidebarGrChat: React.FC = () => {
 
   const admins = members.filter((m) => m.isAdmin);
   const regularMembers = members.filter((m) => !m.isAdmin);
-
-  interface Member {
-    id: number;
-    name: string;
-    avatar: string;
-    email: string;
-    phone: string;
-    isAdmin: boolean;
-  }
 
   const renderMemberItem = (member: Member) => (
     <div

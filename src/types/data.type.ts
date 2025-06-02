@@ -101,3 +101,28 @@ export type ConversationInformationDTO = {
   conversationId: string;
   chatter: UserDTO[];
 };
+
+export interface GroupDTO {
+  id: string;
+  name: string;
+  isPrivate: boolean;
+  url: string;
+  description: string;
+  status: number;
+  maxQuantity: number;
+  creator: {
+    id: string;
+    displayName: string;
+    avatarUrl: string;
+  };
+  createdOn: string;
+  updatedOn: string;
+}
+
+export interface CreateGroupDTO {
+  name: string;
+  isPrivate: boolean;
+  password?: string;
+  description?: string;
+  maxQuantity?: number;
+}
