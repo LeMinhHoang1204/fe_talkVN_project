@@ -1,3 +1,4 @@
+
 export type UserReceiverRES = {
   id: string;
   displayName: string;
@@ -24,7 +25,7 @@ export type GetConversationListItemRES = {
 
 export type GetConversationFoundByUsernameListItemRES = {
   conversations: GetConversationListItemRES[];
-  userIds: string[];
+  searchedUsers: UserReceiverRES[];
 };
 
 export type GetConversationDetailRES = {
