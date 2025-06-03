@@ -36,7 +36,7 @@ function MessagesPage({ ...props }: ConversationProps) {
   const { groupId } = useParams();
   const isGroupChat = !!groupId;
 
-  const { data: messageListData, refetch } = useGetConversationListQuery({
+  const { data: messageListData, refetch, isLoading, error } = useGetConversationListQuery({
     PageIndex: 1,
     PageSize: GET_CONVERSATION_LIST_PAGE_SIZE,
     groupId: isGroupChat ? groupId : undefined, // Truyền groupId
@@ -149,6 +149,9 @@ function MessagesPage({ ...props }: ConversationProps) {
     }
   };
 
+  const groupCalls = (messageListData?.data ?? []).filter(chat => chat.textChatType === "GroupCall");
+  const groupChats = (messageListData?.data ?? []).filter(chat => chat.textChatType === "GroupChat");
+
   return (
     <div className="flex flex-row w-300px h-full bg-[#2B2D31]">
       <div className="flex flex-col md:w-[310px] h-full overflow-auto">
@@ -197,6 +200,35 @@ function MessagesPage({ ...props }: ConversationProps) {
 
         {/* A message is a conversation */}
         <div className="flex flex-col mx-3">
+          {isLoading && <div>Loading...</div>}
+          {error && <div>Error loading chats</div>}
+
+          {/* Group Calls Section */}
+          {groupCalls.length > 0 && (
+            <div>
+              <h2 className="font-bold text-lg mb-2">Group Calls</h2>
+              {groupCalls.map(chat => (
+                <div key={chat.id} className="p-2 border rounded mb-2">
+                  <div className="font-semibold">{chat.name}</div>
+                  {/* Render thêm thông tin nếu muốn */}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Group Chats Section */}
+          {groupChats.length > 0 && (
+            <div>
+              <h2 className="font-bold text-lg mb-2">Group Chats</h2>
+              {groupChats.map(chat => (
+                <div key={chat.id} className="p-2 border rounded mb-2">
+                  <div className="font-semibold">{chat.name}</div>
+                  {/* Render thêm thông tin nếu muốn */}
+                </div>
+              ))}
+            </div>
+          )}  
+
           {messagesToRender.map((message) => (
             <MessageItemInList
               connection={connection}
@@ -266,7 +298,7 @@ function MessagesPage({ ...props }: ConversationProps) {
                     stroke-linejoin="round"
                   />
                 </svg>
-                Video channel 1
+                Video channel 1 
               </div>
             </div>
           </button>
