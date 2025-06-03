@@ -146,12 +146,14 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
 
           {/* phân quyền  */}
           {rolePopupMemberId === member.id && (
-            <div className="absolute z-30 right-full top-0 w-48 bg-[#222] border border-gray-600 rounded p-3 shadow-lg">
-              <h3 className="text-white font-semibold mb-2">Chọn phân quyền</h3>
+            <div className="absolute z-30 right-full top-0 w-48 bg-[#222] border border-gray-600 rounded p-3 shadow-lg font-roboto  text-sm">
+              <h3 className="text-white font-semibold mb-2 border-b border-gray-700 pb-1">
+                Chọn phân quyền
+              </h3>
               {["GroupOwner", "Moderator", "Member", "SystemAdmin"].map(
                 (role) => (
-                  <div key={role} className="mb-1">
-                    <label className="inline-flex items-center cursor-pointer">
+                  <div key={role} className="mb-1 cursor-pointer">
+                    <label className="inline-flex items-center cursor-pointer ">
                       <input
                         type="radio"
                         name={`role-${member.id}`}
@@ -160,7 +162,9 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
                         onChange={() => setSelectedRole(role)}
                         className="mr-2"
                       />
-                      <span className="text-white">{role}</span>
+                      <span className="text-white hover:text-purple-300 transition">
+                        {role}
+                      </span>
                     </label>
                   </div>
                 )
@@ -180,7 +184,7 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
                   onClick={() => setRolePopupMemberId(null)}
                   className="px-3 py-1 bg-gray-500 rounded hover:bg-gray-600 text-white"
                 >
-                  Đóng
+                  Hủy
                 </button>
               </div>
             </div>
@@ -188,8 +192,8 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
 
           {/* hạn chế tin nhắn  */}
           {restrictPopupMemberId === member.id && (
-            <div className="absolute z-30 right-full top-0 w-64 bg-[#1e1e1e] border border-gray-700 rounded-lg p-4 shadow-xl">
-              <h3 className="text-white text-lg font-semibold mb-3">
+            <div className="absolute z-30 right-full top-0 w-64 bg-[#1e1e1e] border border-gray-700 font-roboto  text-sm rounded-lg p-4 shadow-xl">
+              <h3 className="text-white text-lg font-semibold mb-3 border-b border-gray-700 pb-1">
                 Hạn chế tin nhắn
               </h3>
 
@@ -200,7 +204,9 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
                   onChange={() => setRestrictAllChannels((prev) => !prev)}
                   className="form-checkbox h-4 w-4 bg-purple-600 mr-3"
                 />
-                <span className="text-base">Hạn chế tất cả các kênh</span>
+                <span className="text-base  hover:text-purple-300 transition">
+                  Hạn chế tất cả các kênh
+                </span>
               </label>
 
               {!restrictAllChannels && (
@@ -208,11 +214,11 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
                   <p className="text-white text-sm mb-2">
                     Chọn kênh cần hạn chế:
                   </p>
-                  <div className="max-h-40 overflow-y-auto flex flex-col space-y-2">
+                  <div className="max-h-40 overflow-y-auto flex flex-col space-y-2 ">
                     {channels.map((ch) => (
                       <label
                         key={ch}
-                        className="flex items-center bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white rounded px-2 py-2 transition"
+                        className=" hover:text-purple-300 transition cursor-pointer flex items-center bg-[#2a2a2a] hover:bg-[#3a3a3a] text-white rounded px-2 py-2 transition"
                       >
                         <input
                           type="checkbox"
@@ -252,7 +258,7 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
                   onClick={() => setRestrictPopupMemberId(null)}
                   className="px-4 py-2 bg-gray-600 rounded hover:bg-gray-700 text-white font-medium transition"
                 >
-                  Đóng
+                  Hủy
                 </button>
               </div>
             </div>
@@ -276,14 +282,17 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
   return (
     <div
       className={twMerge(
-        "flex flex-col bg-[#2b2d31] w-[42%] px-4 py-4",
+        "font-roboto flex flex-col bg-[#2b2d31] w-[42%]  text-white shadow-lg px-4 py-4",
         !isShow && "hidden"
       )}
+      style={{ fontFamily: "'Roboto', sans-serif" }}
     >
-      <div className="font-semibold mr-[45px] text-lg"> Detail Members</div>
-
+      <div className="font-semibold mr-[45px] text-lg tracking-wide border-b border-gray-700 pb-1 mb-6 leading-9">
+        {" "}
+        Detail Members
+      </div>
       <div
-        className="bg-[#2B2D31] text-white p-4 custom-scrollbar"
+        className="bg-[#2B2D31] text-white p-4 custom-scrollbar cursor-pointer"
         style={{
           width: "350px",
           height: "calc(100vh - 60px)",
@@ -294,12 +303,12 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
           flexShrink: 0,
         }}
       >
-        <p className="text-xs font-semibold text-gray-400 mb-2">
+        <p className="text-xs font-semibold text-gray-400 mb-2  ">
           ADMIN - {admins.length}
         </p>
         {admins.map(renderMemberItem)}
 
-        <p className="text-xs font-semibold text-gray-400 mb-2 mt-4">
+        <p className="text-xs font-semibold text-gray-400 mb-2 mt-4 ">
           MEMBER - {regularMembers.length}
         </p>
         {regularMembers.map(renderMemberItem)}
