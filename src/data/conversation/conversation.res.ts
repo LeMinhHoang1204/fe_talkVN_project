@@ -1,4 +1,3 @@
-
 export type UserReceiverRES = {
   id: string;
   displayName: string;
@@ -18,9 +17,9 @@ export type MessageRES = {
 export type GetConversationListItemRES = {
   id: string;
   userReceivers: UserReceiverRES[];
-  lastMessage: MessageRES;
+  lastMessage: MessageRES | null;
   isSeen: boolean;
-  userReceiverIds: string[];
+  userReceiverIds: { id: string; displayName: string; avatarUrl: string }[];
 };
 
 export type GetConversationFoundByUsernameListItemRES = {

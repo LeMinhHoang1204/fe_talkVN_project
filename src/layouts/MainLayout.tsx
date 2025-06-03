@@ -17,15 +17,11 @@ function MainLayout() {
     sideBarExpandedContent === EXPANDED_CONTENT_TYPE.PROFILE;
 
   return (
-    <div className="flex flex-row flex-start h-full">
-      <div
-        className="relative transition-all w-24 h-full">
-        {/* <div className="w-[6%] bg-[#18092f]"> */}
+    <div className="flex flex-row flex-start h-full w-full">
+      <div className="relative transition-all w-24">
         <SideBar />
-        {/* </div>{" "} */}
-        <SideBarExpandedContent />
       </div>
-      <div className="w-full h-full">
+      <div className="w-[calc(100%-6rem)] h-full">
         <Outlet />
       </div>
       <AddPostModal />

@@ -1,11 +1,19 @@
 import { HTTP_METHOD } from "../../helpers/constants/common.constant";
 import { BaseResponse } from "../../types/data.type";
 import { usersApi } from "../usersApi.api";
-import { CreateGroupRequest, GroupData, createGroupResponse, getAllGroupResponse } from "./group.res";
+import {
+  CreateGroupRequest,
+  GroupData,
+  createGroupResponse,
+  getAllGroupResponse,
+} from "./group.res";
 
 const groupApi = usersApi.injectEndpoints({
   endpoints: (build) => ({
-    getAllGroups: build.query<getAllGroupResponse, { pageIndex?: number; pageSize?: number }>({
+    getAllGroups: build.query<
+      getAllGroupResponse,
+      { pageIndex?: number; pageSize?: number }
+    >({
       query: (params) => ({
         url: `/Group`,
         method: HTTP_METHOD.GET,
@@ -14,10 +22,14 @@ const groupApi = usersApi.injectEndpoints({
           PageSize: params.pageSize || 12,
         },
       }),
-      transformResponse: (response: BaseResponse<getAllGroupResponse>) => response.result,
+      transformResponse: (response: BaseResponse<getAllGroupResponse>) =>
+        response.result,
     }),
-    
-    getUserCreatedGroups: build.query<GroupData[], { pageIndex?: number; pageSize?: number }>({
+
+    getUserCreatedGroups: build.query<
+      GroupData[],
+      { pageIndex?: number; pageSize?: number }
+    >({
       query: (params) => ({
         url: `/Group/get-user-created-groups`,
         method: HTTP_METHOD.GET,
@@ -32,9 +44,27 @@ const groupApi = usersApi.injectEndpoints({
       },
     }),
 
+    getUserJoinedGroups: build.query<
+      GroupData[],
+      { pageIndex?: number; pageSize?: number }
+    >({
+      query: (params) => ({
+        url: `/Group/get-joined-groups`,
+        method: HTTP_METHOD.GET,
+        params: {
+          PageIndex: params.pageIndex || 1,
+          PageSize: params.pageSize || 12,
+        },
+      }),
+      transformResponse: (response: BaseResponse<GroupData[]>) => {
+        console.log("Raw API Response:", response);
+        return response?.result || [];
+      },
+    }),
+
     createGroup: build.mutation<createGroupResponse, CreateGroupRequest>({
       query: (body) => ({
-        url: '/Group',
+        url: "/Group",
         method: HTTP_METHOD.POST,
         body,
       }),
@@ -45,6 +75,7 @@ const groupApi = usersApi.injectEndpoints({
 export const {
   useGetAllGroupsQuery,
   useGetUserCreatedGroupsQuery,
+  useGetUserJoinedGroupsQuery,
   useLazyGetUserCreatedGroupsQuery,
   useCreateGroupMutation,
 } = groupApi;

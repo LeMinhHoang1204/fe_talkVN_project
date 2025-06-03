@@ -1,8 +1,8 @@
-
 export type GetConversationListItemREQ = {
   PageIndex?: number;
   PageSize?: number;
   usernames?: string[];
+  groupId?: string;
   endpoint?: string;
 };
 

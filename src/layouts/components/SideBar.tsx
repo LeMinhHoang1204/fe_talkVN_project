@@ -6,7 +6,10 @@ import {
   GlobalState,
   setSideBarExpandedContent,
 } from "../../data/global/global.slice";
-import { useCreateGroupMutation, useGetUserCreatedGroupsQuery } from "../../data/group/group.api";
+import {
+  useCreateGroupMutation,
+  useGetUserJoinedGroupsQuery,
+} from "../../data/group/group.api";
 import { CreateGroupRequest } from "../../data/group/group.res";
 import { APP_ROUTE } from "../../helpers/constants/route.constant";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
@@ -32,20 +35,17 @@ function SideBar() {
   const [createError, setCreateError] = useState<string>("");
 
   const dispatch = useAppDispatch();
-  const { data: groups, isLoading, error } = useGetUserCreatedGroupsQuery({ pageIndex: 1, pageSize: 12 });
+  const {
+    data: groups,
+    isLoading,
+    error,
+  } = useGetUserJoinedGroupsQuery({ pageIndex: 1, pageSize: 12 });
   const [createGroup, { isLoading: isCreating }] = useCreateGroupMutation();
 
   const { userInfo }: GlobalState = useAppSelector((state) => state.global);
   const userName = userInfo ? userInfo.username : "User";
   const userAvatar = userInfo ? userInfo.avatarUrl : "/default-avatar.png";
   const navigate = useNavigate();
-  
-  console.log("Groups Data:", groups);
-
-  // Track when the component renders
-  useEffect(() => {
-    console.log("SideBar component rendered");
-  });
 
   // Track when groupsData changes
   useEffect(() => {
@@ -54,7 +54,7 @@ function SideBar() {
       isError: !!error,
       hasData: !!groups?.length,
       resultLength: groups?.length,
-      rawData: groups
+      rawData: groups,
     });
   }, [groups, isLoading, error]);
 
@@ -126,9 +126,12 @@ function SideBar() {
     }
   }, [dispatch, userInfo?.userId]);
 
-  const handleGroupClick = useCallback((groupId: string) => {
-    navigate(`/group/${groupId}`);
-  }, [navigate]);
+  const handleGroupClick = useCallback(
+    (groupId: string) => {
+      navigate(`/group/${groupId}`);
+    },
+    [navigate]
+  );
 
   const handleCreateGroup = async () => {
     try {
@@ -143,7 +146,7 @@ function SideBar() {
       }
 
       console.log("newGroup", newGroup);
-      
+
       const response = await createGroup({
         ...newGroup,
         isPrivate: groupType === "private",
@@ -167,9 +170,9 @@ function SideBar() {
   };
 
   return (
-    <div className="bg-[#18092f] flex flex-col items-center justify-between h-screen py-4">
+    <div className="bg-[#18092f] flex flex-col items-center justify-between h-full w-full py-4">
       {/* Top: Logo và Group Avatars */}
-      <div className="flex flex-col items-center space-y-6">
+      <div className="custom-scroll flex flex-col items-center space-y-6 overflow-y-auto overflow-x-hidden h-4/5 w-full">
         <button className="group">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -194,42 +197,44 @@ function SideBar() {
             <div className="text-white text-sm">Loading groups...</div>
           )}
           {error && (
-            <div className="text-red-500 text-sm">Error loading groups: {(error as any)?.data?.message || 'Unknown error'}</div>
+            <div className="text-red-500 text-sm">
+              Error loading groups:{" "}
+              {(error as any)?.data?.message || "Unknown error"}
+            </div>
           )}
-          {!isLoading && !error && groups && groups.length > 0 ? (
-            groups.map((group) => (
-              <div key={group.id} className="relative group/group">
-                <img
-                  src={group.avatar || "/default-group-avatar.png"}
-                  alt={group.name}
-                  className="w-10 h-10 rounded-full border-2 border-white cursor-pointer hover:opacity-80 transition-opacity"
-                  onClick={() => handleGroupClick(group.id)}
-                />
-                <div className="absolute left-full ml-2 px-2 py-1 bg-[#2C2C2C] text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover/group:opacity-100 transition-opacity">
-                  {group.name}
-                  {group.isPrivate && <span className="ml-1">🔒</span>}
+          {!isLoading && !error && groups && groups.length > 0
+            ? groups.map((group) => (
+                <div key={group.id} className="relative group/group">
+                  <img
+                    src={group.avatar || "/default-group-avatar.png"}
+                    alt={group.name}
+                    className="w-10 h-10 rounded-full border-2 border-white cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => handleGroupClick(group.id)}
+                  />
+                  <div className="absolute left-full ml-2 px-2 py-1 bg-[#2C2C2C] text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover/group:opacity-100 transition-opacity">
+                    {group.name}
+                    {group.isPrivate && <span className="ml-1">🔒</span>}
+                  </div>
                 </div>
-              </div>
-            ))
-          ) : !isLoading && (
-            <div className="text-white text-sm">No groups found</div>
-          )}
+              ))
+            : !isLoading && (
+                <div className="text-white text-sm">No groups found</div>
+              )}
         </div>
 
         {/* Create group button with tooltip */}
-        <div className="relative group/icon">
-          <button
-            className="w-12 h-12 bg-[#2E1A47] text-white rounded-full hover:rounded-2xl flex items-center justify-center transition-all duration-200"
-            onClick={() => setShowCreateGroupModal(true)}
-          >
-            <Plus size={24} />
-          </button>
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block">
-            Create Group
-          </div>
+      </div>
+      <div className="relative group/icon">
+        <button
+          className="w-12 h-12 bg-[#2E1A47] text-white rounded-full hover:rounded-2xl flex items-center justify-center transition-all duration-200"
+          onClick={() => setShowCreateGroupModal(true)}
+        >
+          <Plus size={24} />
+        </button>
+        <div className="absolute top-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block">
+          Create Group
         </div>
       </div>
-
       {/* User avatar and logout dropdown */}
       <div className="relative">
         <img
@@ -264,7 +269,9 @@ function SideBar() {
             <h2 className="text-lg font-semibold text-center">Tạo nhóm mới</h2>
 
             {createError && (
-              <div className="text-red-500 text-sm text-center">{createError}</div>
+              <div className="text-red-500 text-sm text-center">
+                {createError}
+              </div>
             )}
 
             {/* Tên nhóm */}
@@ -275,7 +282,9 @@ function SideBar() {
                 className="w-full px-3 py-2 rounded bg-[#2c2c2c] text-white border border-gray-600 focus:outline-none"
                 placeholder="Nhập tên nhóm"
                 value={newGroup.name}
-                onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
+                onChange={(e) =>
+                  setNewGroup({ ...newGroup, name: e.target.value })
+                }
               />
             </div>
 
@@ -287,7 +296,9 @@ function SideBar() {
                 className="w-full px-3 py-2 rounded bg-[#2c2c2c] text-white border border-gray-600 focus:outline-none resize-none"
                 placeholder="Nhập mô tả nhóm"
                 value={newGroup.description}
-                onChange={(e) => setNewGroup({ ...newGroup, description: e.target.value })}
+                onChange={(e) =>
+                  setNewGroup({ ...newGroup, description: e.target.value })
+                }
               />
             </div>
 
@@ -301,7 +312,9 @@ function SideBar() {
                     name="groupType"
                     value="public"
                     checked={groupType === "public"}
-                    onChange={(e) => setGroupType(e.target.value as "public" | "private")}
+                    onChange={(e) =>
+                      setGroupType(e.target.value as "public" | "private")
+                    }
                     className="form-radio text-purple-600"
                   />
                   <span className="text-sm">Public</span>
@@ -312,7 +325,9 @@ function SideBar() {
                     name="groupType"
                     value="private"
                     checked={groupType === "private"}
-                    onChange={(e) => setGroupType(e.target.value as "public" | "private")}
+                    onChange={(e) =>
+                      setGroupType(e.target.value as "public" | "private")
+                    }
                     className="form-radio text-purple-600"
                   />
                   <span className="text-sm">Private</span>
@@ -329,7 +344,9 @@ function SideBar() {
                   className="w-full px-3 py-2 rounded bg-[#2c2c2c] text-white border border-gray-600 focus:outline-none"
                   placeholder="Nhập mật khẩu"
                   value={newGroup.password || ""}
-                  onChange={(e) => setNewGroup({ ...newGroup, password: e.target.value })}
+                  onChange={(e) =>
+                    setNewGroup({ ...newGroup, password: e.target.value })
+                  }
                 />
               </div>
             )}
@@ -345,7 +362,12 @@ function SideBar() {
                 className="w-full px-3 py-2 rounded bg-[#2c2c2c] text-white border border-gray-600 focus:outline-none"
                 placeholder="Nhập số lượng"
                 value={newGroup.maxQuantity}
-                onChange={(e) => setNewGroup({ ...newGroup, maxQuantity: Math.max(2, parseInt(e.target.value) || 2) })}
+                onChange={(e) =>
+                  setNewGroup({
+                    ...newGroup,
+                    maxQuantity: Math.max(2, parseInt(e.target.value) || 2),
+                  })
+                }
               />
             </div>
 
