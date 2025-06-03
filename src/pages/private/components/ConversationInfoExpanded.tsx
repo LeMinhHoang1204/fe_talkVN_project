@@ -168,11 +168,11 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
               <div className="mt-2 flex justify-end space-x-2">
                 <button
                   onClick={() => {
-                    // TODO: Xử lý phân quyền tại đây
+                    // TODO: Xử lý phân quyền
                     console.log(`Phân quyền ${member.id} => ${selectedRole}`);
                     setRolePopupMemberId(null);
                   }}
-                  className="px-3 py-1 bg-purple-700 roundedhover:bg-purple-800 text-white"
+                  className="px-3 py-1 bg-purple-700 rounded hover:bg-purple-800 text-white"
                 >
                   OK
                 </button>

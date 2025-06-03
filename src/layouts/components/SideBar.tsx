@@ -159,7 +159,7 @@ function SideBar() {
   return (
     <div className="bg-[#18092f] flex flex-col items-center justify-between h-full w-full py-4">
       {/* Top: Logo và Group Avatars */}
-      <div className="custom-scroll flex flex-col items-center space-y-6 overflow-y-auto overflow-x-hidden h-4/5 w-full">
+      <div className="custom-scroll flex flex-col items-center space-y-6 overflow-visible  h-4/5 w-full">
         <button className="group">
           <svg
             xmlns="http://www.w3.org/2000/svg"
