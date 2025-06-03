@@ -47,17 +47,6 @@ function SideBar() {
   const userAvatar = userInfo ? userInfo.avatarUrl : "/default-avatar.png";
   const navigate = useNavigate();
 
-  // Track when groupsData changes
-  useEffect(() => {
-    console.log("Groups data changed:", {
-      isLoading,
-      isError: !!error,
-      hasData: !!groups?.length,
-      resultLength: groups?.length,
-      rawData: groups,
-    });
-  }, [groups, isLoading, error]);
-
   const handleSideBarItemSelect = useCallback(
     (index: number, title: SIDEBAR_TITLE) => {
       dispatch(setSideBarExpandedContent(null));
@@ -128,7 +117,7 @@ function SideBar() {
 
   const handleGroupClick = useCallback(
     (groupId: string) => {
-      navigate(`/group/${groupId}`);
+      navigate(`/Group/${groupId}`);
     },
     [navigate]
   );
@@ -144,8 +133,6 @@ function SideBar() {
         setCreateError("Mật khẩu không được để trống với nhóm riêng tư");
         return;
       }
-
-      console.log("newGroup", newGroup);
 
       const response = await createGroup({
         ...newGroup,
@@ -170,9 +157,9 @@ function SideBar() {
   };
 
   return (
-    <div className="bg-[#18092f] flex flex-col items-center justify-between h-screen py-4">
+    <div className="bg-[#18092f] flex flex-col items-center justify-between h-full w-full py-4">
       {/* Top: Logo và Group Avatars */}
-      <div className="custom-scroll flex flex-col items-center space-y-6 overflow-auto h-[550px]">
+      <div className="custom-scroll flex flex-col items-center space-y-6 overflow-y-auto overflow-x-hidden h-4/5 w-full">
         <button className="group">
           <svg
             xmlns="http://www.w3.org/2000/svg"

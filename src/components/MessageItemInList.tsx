@@ -16,6 +16,9 @@ export type MessageItemInListDTO = {
   // receiversId: string[];
   // usersDisplayName: string[];
   receivers: UserDTO[];
+  textChatType: string;
+  name: string;
+  id: string;
 };
 
 export type ConversationListWithUserIds = {
