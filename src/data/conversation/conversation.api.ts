@@ -1,4 +1,7 @@
-import { ConversationListWithUserIds, MessageItemInListDTO } from "../../components/MessageItemInList";
+import {
+  ConversationListWithUserIds,
+  MessageItemInListDTO,
+} from "../../components/MessageItemInList";
 import {
   HTTP_METHOD,
   TAG_TYPES,
@@ -41,6 +44,7 @@ const conversationApi = usersApi.injectEndpoints({
           PageIndex: params.PageIndex,
           PageSize: params.PageSize,
           usernames: params.usernames,
+          groupId: params.groupId,
         },
       }),
       transformResponse: (
@@ -66,14 +70,15 @@ const conversationApi = usersApi.injectEndpoints({
       transformResponse: (
         response: BaseResponse<GetConversationDetailRES>
       ) => ({
-        data: response.result.messages.map((message) =>
-          getMessageListDetailDTO(message, response.result.id)
-        ),
+        data:
+          response.result.messages.map((message) =>
+            getMessageListDetailDTO(message, response.result.id)
+          ) || [],
         isLastPage:
           response.result.messages.length < GET_CONVERSATION_DETAIL_PAGE_SIZE,
       }),
     }),
-    
+
     postAddNewMessage: build.mutation<void, PostAddNewMessageREQ>({
       query: ({ conversationId, messageText }) => ({
         url: `/Conversation/${conversationId}`,
@@ -108,10 +113,10 @@ const conversationApi = usersApi.injectEndpoints({
     ),
     // search conversation by usernames
     getConversationListByUsername: build.query<
-    ConversationListWithUserIds,
+      ConversationListWithUserIds,
       GetConversationListItemREQ
     >({
-      query: ({PageIndex, PageSize, usernames}) => ({
+      query: ({ PageIndex, PageSize, usernames }) => ({
         url: `/Conversation/search`,
         method: HTTP_METHOD.POST,
         params: { PageIndex, PageSize },
@@ -132,7 +137,9 @@ const conversationApi = usersApi.injectEndpoints({
             url: user.avatarUrl,
           },
         })),
-        isLastPage: response.result.conversations.length < GET_CONVERSATION_LIST_PAGE_SIZE,
+        isLastPage:
+          response.result.conversations.length <
+          GET_CONVERSATION_LIST_PAGE_SIZE,
       }),
       providesTags: [TAG_TYPES.CONVERSATION_LIST],
     }),

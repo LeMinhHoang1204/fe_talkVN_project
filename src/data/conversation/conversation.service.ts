@@ -15,15 +15,16 @@ export const getMessageListItemDTO = (
   // userImageUrl: data.userReceivers[0].avatarUrl,
   // receiversId: data.userReceivers.map((user) => user.id),
   // usersDisplayName: data.userReceivers.map((user) => user.displayName),
-  receivers : data.userReceivers.map((user) => ({
-    id: user.id,
-    username: user.displayName,
-    userDisplayName: user.displayName,
-    profileImage: {
-      key: user.avatarUrl,
-      url: user.avatarUrl,
-    },
-  })),
+  receivers:
+    data.userReceivers.map((user) => ({
+      id: user.id,
+      username: user.displayName,
+      userDisplayName: user.displayName,
+      profileImage: {
+        key: user.avatarUrl,
+        url: user.avatarUrl,
+      },
+    })) || [],
 });
 
 export const getMessageListDetailDTO = (
@@ -39,6 +40,3 @@ export const getMessageListDetailDTO = (
   },
   conversationId: id,
 });
-
-
-
