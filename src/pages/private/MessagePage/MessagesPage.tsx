@@ -39,7 +39,8 @@ function MessagesPage({ ...props }: ConversationProps) {
   const { data: messageListData, refetch } = useGetConversationListQuery({
     PageIndex: 1,
     PageSize: GET_CONVERSATION_LIST_PAGE_SIZE,
-    endpoint: isGroupChat ? `/Group/${groupId}/get-all-text-chats` : undefined
+    groupId: isGroupChat ? groupId : undefined, // Truyền groupId
+    endpoint: isGroupChat ? `/Group/get-all-text-chats` : undefined,
   });
 
   const [chatter, setChatter] = useState<UserDTO[]>();
@@ -189,9 +190,9 @@ function MessagesPage({ ...props }: ConversationProps) {
             </div>
           </div>
         </div>
-        
+
         <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
-          <div className="font-bold px-4 pt-2">{autoCaplock('Channels')}</div>
+          <div className="font-bold px-4 pt-2">{autoCaplock("Channels")}</div>
         </div>
 
         {/* A message is a conversation */}
@@ -232,7 +233,10 @@ function MessagesPage({ ...props }: ConversationProps) {
             onClick={() => {
               const videoCallUrl = `/video/${props?.conversationId}`;
               window.open(videoCallUrl, "_blank", "width=800,height=600");
-              connection?.invoke(WEB_SOCKET_EVENT.START_CALL, props?.conversationId);
+              connection?.invoke(
+                WEB_SOCKET_EVENT.START_CALL,
+                props?.conversationId
+              );
             }}
           >
             <div className="flex-col">
