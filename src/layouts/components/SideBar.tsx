@@ -8,7 +8,7 @@ import {
 } from "../../data/global/global.slice";
 import {
   useCreateGroupMutation,
-  useGetUserCreatedGroupsQuery,
+  useGetUserJoinedGroupsQuery,
 } from "../../data/group/group.api";
 import { CreateGroupRequest } from "../../data/group/group.res";
 import { APP_ROUTE } from "../../helpers/constants/route.constant";
@@ -39,21 +39,13 @@ function SideBar() {
     data: groups,
     isLoading,
     error,
-  } = useGetUserCreatedGroupsQuery({ pageIndex: 1, pageSize: 12 });
+  } = useGetUserJoinedGroupsQuery({ pageIndex: 1, pageSize: 12 });
   const [createGroup, { isLoading: isCreating }] = useCreateGroupMutation();
 
   const { userInfo }: GlobalState = useAppSelector((state) => state.global);
   const userName = userInfo ? userInfo.username : "User";
   const userAvatar = userInfo ? userInfo.avatarUrl : "/default-avatar.png";
   const navigate = useNavigate();
-
-  console.log("Groups Data:", groups);
-
-  // Track when the component renders
-  useEffect(() => {
-    console.log("SideBar component rendered");
-  });              
-
 
   // Track when groupsData changes
   useEffect(() => {

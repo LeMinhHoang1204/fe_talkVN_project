@@ -44,6 +44,24 @@ const groupApi = usersApi.injectEndpoints({
       },
     }),
 
+    getUserJoinedGroups: build.query<
+      GroupData[],
+      { pageIndex?: number; pageSize?: number }
+    >({
+      query: (params) => ({
+        url: `/Group/get-joined-groups`,
+        method: HTTP_METHOD.GET,
+        params: {
+          PageIndex: params.pageIndex || 1,
+          PageSize: params.pageSize || 12,
+        },
+      }),
+      transformResponse: (response: BaseResponse<GroupData[]>) => {
+        console.log("Raw API Response:", response);
+        return response?.result || [];
+      },
+    }),
+
     createGroup: build.mutation<createGroupResponse, CreateGroupRequest>({
       query: (body) => ({
         url: "/Group",
@@ -57,6 +75,7 @@ const groupApi = usersApi.injectEndpoints({
 export const {
   useGetAllGroupsQuery,
   useGetUserCreatedGroupsQuery,
+  useGetUserJoinedGroupsQuery,
   useLazyGetUserCreatedGroupsQuery,
   useCreateGroupMutation,
 } = groupApi;
