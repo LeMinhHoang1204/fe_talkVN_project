@@ -198,7 +198,7 @@ function SideBar() {
                     className="w-10 h-10 rounded-full border-2 border-white cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => handleGroupClick(group.id)}
                   />
-                  <div className="absolute left-full ml-2 px-2 py-1 bg-[#2C2C2C] text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover/group:opacity-100 transition-opacity">
+                  <div className="absolute right-full ml-2 px-2 py-1 bg-[#2C2C2C] text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover/group:opacity-100 transition-opacity absolute z-10">
                     {group.name}
                     {group.isPrivate && <span className="ml-1">🔒</span>}
                   </div>

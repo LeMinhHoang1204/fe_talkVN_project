@@ -17,7 +17,7 @@ function MainLayout() {
     sideBarExpandedContent === EXPANDED_CONTENT_TYPE.PROFILE;
 
   return (
-    <div className="flex flex-row flex-start h-full w-full">
+    <div className="flex flex-row flex-start h-full w-full overflow-hidden">
       <div className="relative transition-all w-24">
         <SideBar />
       </div>
