@@ -19,7 +19,6 @@ export const APP_ROUTE = {
     SEARCH_POST: `${ROUTE_NAME.MAIN}/search-post`,
     VIDEO: (conversationId: string) =>
       `${ROUTE_NAME.MAIN}/video/${conversationId}`,
-    GROUP: (groupId: string) => `/group/${groupId}`,
   },
 
   FULL_SCREEN: {

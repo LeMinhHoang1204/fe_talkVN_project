@@ -34,11 +34,14 @@ export const router = createBrowserRouter([
           },
           {
             path: APP_ROUTE.MAIN.MESSAGES,
-            element: <MessagesPage />,
-          },
-          {
-            path: "/group/:groupId",
-            element: <MessagesPage />,
+            element: (
+              <MessagesPage
+                conversationId={""}
+                chatter={[]}
+                lastChatterActiveTime={0}
+                connection={null}
+              />
+            ),
           },
           {
             path: APP_ROUTE.MAIN.PROFILE(":id"),

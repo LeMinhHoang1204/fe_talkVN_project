@@ -3,12 +3,10 @@ export default function WelcomePage() {
     <div
       className="flex items-center justify-center color-[#313338] text-white"
       style={{
-        width: "700px",
-        height: "499px",
+        width: "100vw",
+        height: "100vh",
         flexShrink: 0,
-        margin: "0 auto",
         top: "60px",
-        marginRight: "240px",
         background: "#313338",
       }}
     >

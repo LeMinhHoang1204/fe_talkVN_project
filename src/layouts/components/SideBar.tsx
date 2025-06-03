@@ -172,7 +172,7 @@ function SideBar() {
   return (
     <div className="bg-[#18092f] flex flex-col items-center justify-between h-screen py-4">
       {/* Top: Logo và Group Avatars */}
-      <div className="flex flex-col items-center space-y-6">
+      <div className="custom-scroll flex flex-col items-center space-y-6 overflow-auto h-[550px]">
         <button className="group">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -223,19 +223,18 @@ function SideBar() {
         </div>
 
         {/* Create group button with tooltip */}
-        <div className="relative group/icon">
-          <button
-            className="w-12 h-12 bg-[#2E1A47] text-white rounded-full hover:rounded-2xl flex items-center justify-center transition-all duration-200"
-            onClick={() => setShowCreateGroupModal(true)}
-          >
-            <Plus size={24} />
-          </button>
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block">
-            Create Group
-          </div>
+      </div>
+      <div className="relative group/icon">
+        <button
+          className="w-12 h-12 bg-[#2E1A47] text-white rounded-full hover:rounded-2xl flex items-center justify-center transition-all duration-200"
+          onClick={() => setShowCreateGroupModal(true)}
+        >
+          <Plus size={24} />
+        </button>
+        <div className="absolute top-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block">
+          Create Group
         </div>
       </div>
-
       {/* User avatar and logout dropdown */}
       <div className="relative">
         <img
