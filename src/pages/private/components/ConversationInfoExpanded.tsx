@@ -172,7 +172,7 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
                     console.log(`Phân quyền ${member.id} => ${selectedRole}`);
                     setRolePopupMemberId(null);
                   }}
-                  className="px-3 py-1 bg-green-600 rounded hover:bg-green-700 text-white"
+                  className="px-3 py-1 bg-purple-700 roundedhover:bg-purple-800 text-white"
                 >
                   OK
                 </button>
@@ -198,7 +198,7 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
                   type="checkbox"
                   checked={restrictAllChannels}
                   onChange={() => setRestrictAllChannels((prev) => !prev)}
-                  className="form-checkbox h-4 w-4 text-green-500 mr-3"
+                  className="form-checkbox h-4 w-4 bg-purple-600 mr-3"
                 />
                 <span className="text-base">Hạn chế tất cả các kênh</span>
               </label>
@@ -224,7 +224,7 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
                                 : [...prev, ch]
                             );
                           }}
-                          className="form-checkbox h-4 w-4 text-green-500 mr-3"
+                          className="form-checkbox h-4 w-4 bg-purple-600 mr-3"
                         />
                         <span className="text-sm">{ch}</span>
                       </label>
@@ -244,7 +244,7 @@ function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
                     );
                     setRestrictPopupMemberId(null);
                   }}
-                  className="px-4 py-2 bg-green-600 rounded hover:bg-green-700 text-white font-medium transition"
+                  className="px-4 py-2 bg-purple-700 rounded hover:bg-purple-800 text-white font-medium transition"
                 >
                   OK
                 </button>
