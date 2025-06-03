@@ -4,6 +4,7 @@ import {
   HubConnectionBuilder,
   LogLevel,
 } from "@microsoft/signalr";
+import { enqueueSnackbar } from "notistack";
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
@@ -12,11 +13,13 @@ import { MicrophoneIcon } from "../../../components/icons/MicrophoneIcon";
 import { MicrophoneMutedIcon } from "../../../components/icons/MicrophoneMutedIcon";
 import { ShareScreenIcon } from "../../../components/icons/ShareScreenIcon";
 import { StopShareScreenIcon } from "../../../components/icons/StopShareScreenIcon";
+import { UserInCallIcon } from "../../../components/icons/UserInCall";
 import { VideoCallIcon } from "../../../components/icons/VideoCallIcon";
 import { VideoCallMuteIcon } from "../../../components/icons/VideoCallMuteIcon";
+import { useCheckPermissionMutation } from "../../../data/permission/permission.api.ts";
 import { socketBaseUrl } from "../../../helpers/constants/configs.constant";
 import { WEB_SOCKET_EVENT } from "../../../helpers/constants/websocket-event.constant";
-import { UserInCallIcon } from "../../../components/icons/UserInCall";
+
 
 const VideoCall: React.FC = () => {
   const { conversationId } = useParams<{ conversationId: string }>();
@@ -30,6 +33,8 @@ const VideoCall: React.FC = () => {
   const [isMuted, setIsMuted] = useState(true); // Trạng thái mic
   const [isScreenSharing, setIsScreenSharing] = useState(false); // Trạng thái chia sẻ màn hình
   const [isCameraOn, setIsCameraOn] = useState(true); // Trạng thái camera
+
+  const [checkPermission] = useCheckPermissionMutation();
 
   useEffect(() => {
     const servers = {
@@ -227,7 +232,17 @@ const VideoCall: React.FC = () => {
     };
   }, [conversationId]);
 
-  const toggleMute = () => {
+  const toggleMute = async () => {
+    const { allowed, reason } = await checkPermission({
+      action: "turn_on_mic",
+      conversationId,
+    }).unwrap();
+
+    if (!allowed) {
+      enqueueSnackbar(reason || "You do not have permission to turn on the mic", { variant: "error" });
+      return;
+    }
+
     if (localVideoRef.current?.srcObject) {
       const stream = localVideoRef.current.srcObject as MediaStream;
       stream.getAudioTracks().forEach((track) => {
@@ -297,7 +312,17 @@ const VideoCall: React.FC = () => {
     }
   };
 
-  const toggleCamera = () => {
+  const toggleCamera = async () => {
+    const { allowed, reason } = await checkPermission({
+      action: "turn_on_camera",
+      conversationId,
+    }).unwrap();
+
+    if (!allowed) {
+      enqueueSnackbar(reason || "You do not have permission to turn on the camera", { variant: "error" });
+      return;
+    }
+
     if (localVideoRef.current?.srcObject) {
       const stream = localVideoRef.current.srcObject as MediaStream;
       const videoTrack = stream.getVideoTracks()[0];
