@@ -67,6 +67,29 @@ export type createGroupResponse = {
   }>;
 };
 
+export interface GroupChannels {
+  id: string;
+  name: string;
+  textChatType: 'GroupChat' | 'GroupCall';
+  groupId: string;
+  lastMessage: any | null;
+  createdBy: any | null;
+  userReceivers: Array<{
+    id: string;
+    displayName: string;
+    avatarUrl: string;
+  }>;
+}
+
+export type getGroupChannelsResponse = {
+  succeeded: boolean;
+  result: GroupChannels[];
+  errors: Array<{
+    code: string;
+    message: string;
+  }>;
+};
+
 export type getGroupMembersResponse = {
   succeeded: boolean;
   result: Array<{

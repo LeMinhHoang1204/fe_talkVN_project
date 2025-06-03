@@ -14,3 +14,7 @@ export type RequestJoinGroup = {
 export type ApproveJoinGroupRequest = {
     joinGroupRequestId: string;
 };
+
+export type GetGroupRequest = {
+    groupId: string;
+};

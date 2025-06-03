@@ -1,7 +1,8 @@
 import { HTTP_METHOD } from "../../helpers/constants/common.constant";
 import { BaseResponse } from "../../types/data.type";
 import { usersApi } from "../usersApi.api";
-import { CreateGroupRequest, GroupData, createGroupResponse, getAllGroupResponse, getGroupByInvitationCodeResponse } from "./group.res";
+import { GetGroupRequest } from "./group.req";
+import { CreateGroupRequest, GroupData, createGroupResponse, getAllGroupResponse, getGroupByInvitationCodeResponse, getGroupChannelsResponse } from "./group.res";
 
 const groupApi = usersApi.injectEndpoints({
   endpoints: (build) => ({
@@ -47,6 +48,14 @@ const groupApi = usersApi.injectEndpoints({
         params: { invitationCode },
       }),
     }),
+
+    getGroupChannels: build.query<getGroupChannelsResponse, GetGroupRequest>({
+      query: ({ groupId }) => ({
+      url: `/Group/${groupId}`,
+      method: HTTP_METHOD.GET,
+      }),
+      transformResponse: (response: BaseResponse<getGroupChannelsResponse>) => response.result,
+    }),
   }),
 });
 
@@ -56,4 +65,5 @@ export const {
   useLazyGetUserJoinedGroupsQuery,
   useCreateGroupMutation,
   useGetGroupByInvitationCodeQuery,
+  useGetGroupChannelsQuery,
 } = groupApi;
