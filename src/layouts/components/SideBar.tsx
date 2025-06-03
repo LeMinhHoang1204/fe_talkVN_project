@@ -6,7 +6,11 @@ import {
   GlobalState,
   setSideBarExpandedContent,
 } from "../../data/global/global.slice";
-import { getAllGroup } from "../../data/group/group.api";
+import {
+  useCreateGroupMutation,
+  useGetUserCreatedGroupsQuery,
+} from "../../data/group/group.api";
+import { CreateGroupRequest } from "../../data/group/group.res";
 import { APP_ROUTE } from "../../helpers/constants/route.constant";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { useBreakpoint } from "../../hooks/useBreakPoint";
@@ -14,57 +18,54 @@ import {
   EXPANDED_CONTENT_TYPE,
   SIDEBAR_TITLE,
 } from "../../types/side-bar.type";
-import {
-  useGetGroupListQuery,
-  usePostGroupMutation,
-} from "../../data/group/group.api";
 
 function SideBar() {
-  const { data: DATA_GROUP, refetch } = useGetGroupListQuery();
-  console.log("DATA_GROUP", DATA_GROUP);
-
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
   const [activedIndex, setActivedIndex] = useState<number>(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [showCreateGroupModal, setShowCreateGroupModal] =
     useState<boolean>(false);
   const [groupType, setGroupType] = useState<"public" | "private">("public");
-  const [groups, setGroups] = useState<any[]>([]);
+  const [newGroup, setNewGroup] = useState<CreateGroupRequest>({
+    name: "",
+    description: "",
+    isPrivate: false,
+    maxQuantity: 50,
+  });
+  const [createError, setCreateError] = useState<string>("");
 
   const dispatch = useAppDispatch();
+  const {
+    data: groups,
+    isLoading,
+    error,
+  } = useGetUserCreatedGroupsQuery({ pageIndex: 1, pageSize: 12 });
+  const [createGroup, { isLoading: isCreating }] = useCreateGroupMutation();
 
   const { userInfo }: GlobalState = useAppSelector((state) => state.global);
   const userName = userInfo ? userInfo.username : "User";
   const userAvatar = userInfo ? userInfo.avatarUrl : "/default-avatar.png";
   const navigate = useNavigate();
 
-  // state post group
-  const [groupName, setGroupName] = useState("");
-  const [description, setDescription] = useState("");
-  const [password, setPassword] = useState("");
-  const [maxMembers, setMaxMembers] = useState<number>(2);
+  console.log("Groups Data:", groups);
 
-  const [postGroup, { isLoading }] = usePostGroupMutation();
+  // Track when the component renders
+  useEffect(() => {
+    console.log("SideBar component rendered");
+  });              
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
 
-    const payload: any = {
-      name: groupName,
-      description,
-      isPrivate: groupType === "public" ? false : true,
-      password: groupType === "private" ? password : "",
-      maxQuantity: maxMembers,
-    };
+  // Track when groupsData changes
+  useEffect(() => {
+    console.log("Groups data changed:", {
+      isLoading,
+      isError: !!error,
+      hasData: !!groups?.length,
+      resultLength: groups?.length,
+      rawData: groups,
+    });
+  }, [groups, isLoading, error]);
 
-    try {
-      const response = await postGroup(payload).unwrap();
-      setShowCreateGroupModal(false);
-      refetch();
-    } catch (error) {
-      console.error("Lỗi khi tạo nhóm:", error);
-    }
-  };
   const handleSideBarItemSelect = useCallback(
     (index: number, title: SIDEBAR_TITLE) => {
       dispatch(setSideBarExpandedContent(null));
@@ -133,18 +134,53 @@ function SideBar() {
     }
   }, [dispatch, userInfo?.userId]);
 
-  useEffect(() => {
-    async function fetchGroups() {
-      const res = await getAllGroup(0, 12);
-      setGroups(res.groups || []);
+  const handleGroupClick = useCallback(
+    (groupId: string) => {
+      navigate(`/group/${groupId}`);
+    },
+    [navigate]
+  );
+
+  const handleCreateGroup = async () => {
+    try {
+      setCreateError("");
+      if (!newGroup.name.trim()) {
+        setCreateError("Tên nhóm không được để trống");
+        return;
+      }
+      if (groupType === "private" && !newGroup.password) {
+        setCreateError("Mật khẩu không được để trống với nhóm riêng tư");
+        return;
+      }
+
+      console.log("newGroup", newGroup);
+
+      const response = await createGroup({
+        ...newGroup,
+        isPrivate: groupType === "private",
+      }).unwrap();
+
+      if (response.succeeded) {
+        setShowCreateGroupModal(false);
+        setNewGroup({
+          name: "",
+          description: "",
+          isPrivate: false,
+          maxQuantity: 50,
+        });
+        setGroupType("public");
+      } else {
+        setCreateError(response.errors?.[0]?.message || "Không thể tạo nhóm");
+      }
+    } catch (err: any) {
+      setCreateError(err.data?.message || "Đã xảy ra lỗi khi tạo nhóm");
     }
-    fetchGroups();
-  }, []);
+  };
 
   return (
     <div className="bg-[#18092f] flex flex-col items-center justify-between h-screen py-4">
       {/* Top: Logo và Group Avatars */}
-      <div className="flex flex-col items-center space-y-6 overflow-auto h-[550px] scrollbar scrollbar-thin scrollbar-thumb-rounded">
+      <div className="custom-scroll flex flex-col items-center space-y-6 overflow-auto h-[550px]">
         <button className="group">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -163,26 +199,38 @@ function SideBar() {
             />
           </svg>
         </button>
-<<<<<<< HEAD
-        {/* Nhóm với ảnh avatar ngẫu nhiên */}
-        {DATA_GROUP?.map((group: any) => (
-          <img
-            key={group.id}
-            src={group.avatar}
-=======
-        {/* Danh sách group thật */}
-        {groups.map((group) => (
-          <img
-            key={group.id}
-            src={group.avatar || "/default-avatar.png"}
->>>>>>> 138d8a10853e7030f3e658a49174cd1342b0703f
-            alt={group.name}
-            className="w-10 h-10 rounded-full border-2 border-white cursor-pointer hover:opacity-80"
-            title={group.name}
-          />
-        ))}
+        {/* Group list */}
+        <div className="flex flex-col items-center gap-4">
+          {isLoading && (
+            <div className="text-white text-sm">Loading groups...</div>
+          )}
+          {error && (
+            <div className="text-red-500 text-sm">
+              Error loading groups:{" "}
+              {(error as any)?.data?.message || "Unknown error"}
+            </div>
+          )}
+          {!isLoading && !error && groups && groups.length > 0
+            ? groups.map((group) => (
+                <div key={group.id} className="relative group/group">
+                  <img
+                    src={group.avatar || "/default-group-avatar.png"}
+                    alt={group.name}
+                    className="w-10 h-10 rounded-full border-2 border-white cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => handleGroupClick(group.id)}
+                  />
+                  <div className="absolute left-full ml-2 px-2 py-1 bg-[#2C2C2C] text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover/group:opacity-100 transition-opacity">
+                    {group.name}
+                    {group.isPrivate && <span className="ml-1">🔒</span>}
+                  </div>
+                </div>
+              ))
+            : !isLoading && (
+                <div className="text-white text-sm">No groups found</div>
+              )}
+        </div>
 
-        {/* Nút "+" có tooltip */}
+        {/* Create group button with tooltip */}
       </div>
       <div className="relative group/icon">
         <button
@@ -191,32 +239,27 @@ function SideBar() {
         >
           <Plus size={24} />
         </button>
-        <div
-          className="absolute top-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block"
-          style={{ fontSize: "11px" }}
-        >
-          Tạo nhóm
+        <div className="absolute top-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block">
+          Create Group
         </div>
       </div>
-
-      {/* Avatar người dùng và Dropdown logout */}
+      {/* User avatar and logout dropdown */}
       <div className="relative">
         <img
-          src="public\pexels-lum3n-44775-406014.jpg"
+          src={userAvatar}
           alt="User Avatar"
           onClick={() => setIsDropdownOpen((prev) => !prev)}
-          className="w-10 h-10 rounded-full cursor-pointer border-2 border-white"
+          className="w-10 h-10 rounded-full cursor-pointer border-2 border-white hover:opacity-80 transition-opacity"
         />
         {isDropdownOpen && (
           <div className="absolute bottom-12 left-[130%] -translate-x-1/2 bg-white text-black rounded-lg shadow-lg px-4 py-2 text-sm whitespace-nowrap z-50 flex flex-col items-start">
             <p className="font-semibold">{userName}</p>
             <button
               onClick={() => navigate(APP_ROUTE.MAIN.PROFILE(userInfo.userId))}
-              className="text-red-500 hover:underline mt-1"
+              className="hover:underline"
             >
               My account
             </button>
-
             <button
               onClick={handleLogout}
               className="text-red-500 hover:underline mt-1"
@@ -229,12 +272,15 @@ function SideBar() {
 
       {/* Modal tạo nhóm mới */}
       {showCreateGroupModal && (
-        <form
-          onSubmit={handleSubmit}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-        >
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-[#1e122d] text-white p-5 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-xl space-y-4">
             <h2 className="text-lg font-semibold text-center">Tạo nhóm mới</h2>
+
+            {createError && (
+              <div className="text-red-500 text-sm text-center">
+                {createError}
+              </div>
+            )}
 
             {/* Tên nhóm */}
             <div>
@@ -243,8 +289,10 @@ function SideBar() {
                 type="text"
                 className="w-full px-3 py-2 rounded bg-[#2c2c2c] text-white border border-gray-600 focus:outline-none"
                 placeholder="Nhập tên nhóm"
-                value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
+                value={newGroup.name}
+                onChange={(e) =>
+                  setNewGroup({ ...newGroup, name: e.target.value })
+                }
               />
             </div>
 
@@ -255,8 +303,10 @@ function SideBar() {
                 rows={2}
                 className="w-full px-3 py-2 rounded bg-[#2c2c2c] text-white border border-gray-600 focus:outline-none resize-none"
                 placeholder="Nhập mô tả nhóm"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={newGroup.description}
+                onChange={(e) =>
+                  setNewGroup({ ...newGroup, description: e.target.value })
+                }
               />
             </div>
 
@@ -301,8 +351,10 @@ function SideBar() {
                   type="password"
                   className="w-full px-3 py-2 rounded bg-[#2c2c2c] text-white border border-gray-600 focus:outline-none"
                   placeholder="Nhập mật khẩu"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={newGroup.password || ""}
+                  onChange={(e) =>
+                    setNewGroup({ ...newGroup, password: e.target.value })
+                  }
                 />
               </div>
             )}
@@ -317,27 +369,44 @@ function SideBar() {
                 min={2}
                 className="w-full px-3 py-2 rounded bg-[#2c2c2c] text-white border border-gray-600 focus:outline-none"
                 placeholder="Nhập số lượng"
-                value={maxMembers}
-                onChange={(e) => setMaxMembers(Number(e.target.value))}
+                value={newGroup.maxQuantity}
+                onChange={(e) =>
+                  setNewGroup({
+                    ...newGroup,
+                    maxQuantity: Math.max(2, parseInt(e.target.value) || 2),
+                  })
+                }
               />
             </div>
 
             <div className="flex justify-end space-x-3 pt-2">
               <button
-                onClick={() => setShowCreateGroupModal(false)}
+                onClick={() => {
+                  setShowCreateGroupModal(false);
+                  setCreateError("");
+                  setNewGroup({
+                    name: "",
+                    description: "",
+                    isPrivate: false,
+                    maxQuantity: 50,
+                  });
+                  setGroupType("public");
+                }}
                 className="px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded text-sm"
+                disabled={isCreating}
               >
                 Hủy
               </button>
               <button
-                type="submit"
-                className="px-4 py-2 bg-[#5b21b6] hover:bg-[#6d28d9] rounded text-sm"
+                onClick={handleCreateGroup}
+                className="px-4 py-2 bg-[#5b21b6] hover:bg-[#6d28d9] rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isCreating}
               >
-                Tạo nhóm
+                {isCreating ? "Đang tạo..." : "Tạo nhóm"}
               </button>
             </div>
           </div>
-        </form>
+        </div>
       )}
     </div>
   );

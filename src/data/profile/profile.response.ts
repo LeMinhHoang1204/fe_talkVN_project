@@ -6,6 +6,10 @@ export type GetProfileSearchRES = {
   bio: string | null;
   dateOfBirth: string | null;
   gender: string | null;
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  role?: string | null;
 };
 
 export type GetProfileDetailRES = {
@@ -15,7 +19,10 @@ export type GetProfileDetailRES = {
   email: string;
   phoneNumber: string;
   bio: string;
-  dateOfBith: string;
+  dateOfBirth: string;
   gender: string;
-  isFollowed: boolean;
+  // isFollowed: boolean;
+  firstName?: string;
+  lastName?: string;
+  role?: string;
 };

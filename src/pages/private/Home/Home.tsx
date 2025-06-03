@@ -5,7 +5,6 @@ const Home = () => {
   const navigate = useNavigate();
   return (
     <div className="relative min-h-screen w-full overflow-hidden ">
-<<<<<<< HEAD
       <div className="relative">
         <video
           className="w-full h-full object-cover"
@@ -24,25 +23,6 @@ const Home = () => {
               Fun group chat and meeting <br /> (Chưa fix lên trên được)
             </p>
           </div>
-=======
-      <video
-        className="w-full h-full object-cover"
-        autoPlay
-        loop
-        muted
-        playsInline
-      >
-        <source src="/video/backgroud_home.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-
-      <div className=" inset-0 flex items-center justify-center px-4 z-10 ">
-        <div className="bg-black bg-opacity-65 rounded-[40px] p-5 text-white text-center shadow-lg">
-          <h1 className="text-5xl font-bold mb-4">TalkVN</h1>
-          <p className="text-xl">
-            Fun group chat and meeting <br /> (Chưa fix lên trên được)
-          </p>
->>>>>>> 138d8a10853e7030f3e658a49174cd1342b0703f
         </div>
       </div>
 

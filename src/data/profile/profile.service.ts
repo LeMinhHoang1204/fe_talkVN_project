@@ -8,6 +8,11 @@ export type ProfileSearchDTO = {
   displayName: string;
   avatarUrl: string;
   bio: string;
+  email?: string;
+  phoneNumber?: string;
+  lastName?: string;
+  firstName?: string;
+  role?: string;
 };
 
 export const getProfileSearchDTO = (
@@ -18,6 +23,11 @@ export const getProfileSearchDTO = (
   displayName: data.displayName || "",
   avatarUrl: data.avatarUrl || "",
   bio: data.bio || "",
+  email: data.email || "",
+  phoneNumber: data.phoneNumber || "",
+  lastName: data.lastName || "",
+  firstName: data.firstName || "",
+  role: data.role || "",
 });
 
 export const getProfileDetailDTO = (
@@ -35,6 +45,11 @@ export const getProfileDetailDTO = (
   followerCount: 0,
   followingCount: 0,
   isFollowed: data.isFollowed,
+  email: data.email || "",
+  phoneNumber: data.phoneNumber || "",
+  lastName: data.lastName || "",
+  firstName: data.firstName || "",
+  role: data.role || "",
 });
 
 export const getRecommendUserDTO = (data: RecommendUserRES): UserDTO => ({
@@ -45,4 +60,9 @@ export const getRecommendUserDTO = (data: RecommendUserRES): UserDTO => ({
     key: data.user.avatarUrl,
     url: data.user.avatarUrl,
   },
+  email: data.user.email || "",
+  phoneNumber: data.user.phoneNumber || "",
+  lastName: data.user.lastName || "",
+  firstName: data.user.firstName || "",
+  role: data.user.role || "",
 });
