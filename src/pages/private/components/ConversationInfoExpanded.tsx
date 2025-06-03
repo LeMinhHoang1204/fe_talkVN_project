@@ -195,7 +195,7 @@ function ConversationInfoExpanded({
                     console.log(`Phân quyền ${member.id} => ${role}`);
                     setSelectedRole(role);
                     setRolePopupMemberId(null);
-                    // TODO: Thêm logic gọi API hoặc cập nhật backend tại đây
+                    // TODO: Thêm logic gọi API hoặc cập nhật backend
                   }}
                 >
                   {role}
