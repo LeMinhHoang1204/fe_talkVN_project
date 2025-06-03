@@ -47,17 +47,6 @@ function SideBar() {
   const userAvatar = userInfo ? userInfo.avatarUrl : "/default-avatar.png";
   const navigate = useNavigate();
 
-  // Track when groupsData changes
-  useEffect(() => {
-    console.log("Groups data changed:", {
-      isLoading,
-      isError: !!error,
-      hasData: !!groups?.length,
-      resultLength: groups?.length,
-      rawData: groups,
-    });
-  }, [groups, isLoading, error]);
-
   const handleSideBarItemSelect = useCallback(
     (index: number, title: SIDEBAR_TITLE) => {
       dispatch(setSideBarExpandedContent(null));
@@ -128,7 +117,7 @@ function SideBar() {
 
   const handleGroupClick = useCallback(
     (groupId: string) => {
-      navigate(`/group/${groupId}`);
+      navigate(`/Group/${groupId}`);
     },
     [navigate]
   );
@@ -144,8 +133,6 @@ function SideBar() {
         setCreateError("Mật khẩu không được để trống với nhóm riêng tư");
         return;
       }
-
-      console.log("newGroup", newGroup);
 
       const response = await createGroup({
         ...newGroup,
