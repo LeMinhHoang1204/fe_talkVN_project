@@ -19,10 +19,7 @@ function MainLayout() {
   return (
     <div className="flex flex-row flex-start h-full">
       <div
-        className={`relative transition-all ${
-          isSidebarExpanded ? "w-24" : "w-[500px]"
-        }`}
-      >
+        className="relative transition-all w-24 h-full">
         {/* <div className="w-[6%] bg-[#18092f]"> */}
         <SideBar />
         {/* </div>{" "} */}

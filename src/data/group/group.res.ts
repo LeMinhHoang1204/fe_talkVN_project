@@ -10,15 +10,16 @@ export interface GroupData {
     id: string;
     name: string;
     isPrivate: boolean;
-    avatar?: string;
-    url?: string;
-    description?: string;
+    avatar: string;
+    url: string;
+    description: string;
+    status: number;
     maxQuantity: number;
     creator: {
         id: string;
+        displayName: string;
+        avatarUrl: string;
     };
-    displayName?: string;
-    avatarUrl?: string;
     createdOn: string;
     updatedOn: string;
 }
