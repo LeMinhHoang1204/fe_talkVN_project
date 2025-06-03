@@ -20,5 +20,10 @@ export type RecommendUserRES = {
     id: string;
     displayName: string;
     avatarUrl: string;
+    email?: string;
+    phoneNumber?: string;
+    lastName?: string;
+    firstName?: string;
+    role?: string;
   };
 };

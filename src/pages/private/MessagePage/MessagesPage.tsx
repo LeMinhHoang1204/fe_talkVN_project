@@ -40,7 +40,7 @@ function MessagesPage({ ...props }: ConversationProps) {
     PageIndex: 1,
     PageSize: GET_CONVERSATION_LIST_PAGE_SIZE,
     groupId: isGroupChat ? groupId : undefined, // Truyền groupId
-    endpoint: isGroupChat ? `/Group/get-all-text-chats` : undefined,
+    endpoint: isGroupChat ? `/Group/${groupId}` : undefined,
   });
 
   const [chatter, setChatter] = useState<UserDTO[]>();

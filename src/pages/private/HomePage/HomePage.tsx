@@ -12,6 +12,7 @@ import { useAppSelector } from "../../../hooks/reduxHooks";
 import { useBreakpoint } from "../../../hooks/useBreakPoint";
 import { PostDTO } from "../../../types/data.type";
 import PostDetailModal from "../components/PostDetailModal";
+import WelcomePage from "../Home/WelcomePage";
 
 export const GET_POST_HOME_PAGE_SIZE = 3;
 
@@ -87,70 +88,8 @@ function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <div
-      ref={scrollableRef}
-      className="flex h-full w-full pb-8 overflow-auto justify-between flex-col"
-    >
-      <div className="flex-1 flex flex-row mt-5">
-        <div className="flex overflow-auto flex-col gap-8 items-center flex-1 mt-4">
-          {postDataPagination &&
-            postDataPagination.map((postData) => (
-              <PostCard
-                onCommentClick={() => {
-                  setSelectedPostId(postData.id);
-                }}
-                key={postData.id}
-                postData={postData}
-              />
-            ))}
-        </div>
-
-        {/* Profile Button - Suggest Friend */}
-        <div
-          className={twMerge(
-            "flex flex-col pl-16 xl:pr-72",
-            !isScreenLargerThanLg && "hidden"
-          )}
-        >
-          <UserSummarySuggestCard
-            id={userInfo.userId}
-            avatarUrl={userInfo.avatarUrl}
-            username={userInfo.username}
-            summarySuggestContent={userInfo.displayName}
-            actionLabel={"Switch"}
-            onActionClick={() => {}}
-          />
-          {/* Suggestion  */}
-          <div className="flex flex-row mt-8 w-full items-center justify-between">
-            <div className="text-sm font-medium text-gray-500">
-              {"Suggestion for you"}
-            </div>
-            <button className="text-sm font-medium text-gray-900">
-              {"View alls"}
-            </button>
-          </div>
-          {recommendUsers?.map((userSuggestData) => (
-            <UserSummarySuggestCard
-              key={userSuggestData.username}
-              actionLabel={"View"}
-              onActionClick={() => {
-                navigate(APP_ROUTE.MAIN.PROFILE(userSuggestData.id));
-              }}
-              avatarUrl={userSuggestData.profileImage.url}
-              username={userSuggestData.username}
-              summarySuggestContent={"Suggest"}
-              id={userSuggestData.id}
-            />
-          ))}
-          <PostDetailModal
-            postId={selectedPostId}
-            onClose={() => {
-              setSelectedPostId(null);
-            }}
-          />
-        </div>
-      </div>
-      <div ref={bottomRef} className="h-64 flex flex-1 w-full" />
+    <div className="flex items-start">
+      <WelcomePage />
     </div>
   );
 }
