@@ -28,7 +28,7 @@ const groupApi = usersApi.injectEndpoints({
         },
       }),
       transformResponse: (response: BaseResponse<GroupData[]>) => {
-        console.log("Raw API Response:", response);
+        // console.log("Raw API Response:", response);
         return response?.result || [];
       },
     }),

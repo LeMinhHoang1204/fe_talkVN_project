@@ -49,12 +49,15 @@ const conversationApi = usersApi.injectEndpoints({
       }),
       transformResponse: (
         response: BaseResponse<GetConversationListItemRES[]>
-      ) => ({
-        data: response.result.map((conversation) =>
-          getMessageListItemDTO(conversation)
-        ),
-        isLastPage: response.result.length < GET_CONVERSATION_LIST_PAGE_SIZE,
-      }),
+      ) => {
+        console.log(response);
+        return {
+          data: response.result.map((conversation) =>
+            getMessageListItemDTO(conversation)
+          ),
+          isLastPage: response.result.length < GET_CONVERSATION_LIST_PAGE_SIZE,
+        };
+      },
       providesTags: [TAG_TYPES.CONVERSATION_LIST],
     }),
 

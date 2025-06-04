@@ -60,6 +60,18 @@ function MessagesPage({ ...props }: ConversationProps) {
 
   const [searchedUsers, setSearchedUsers] = useState<UserDTO[]>([]);
 
+  useEffect(() => {
+    console.log(messagesToRender);
+  }, [messagesToRender]);
+
+  const textChannels = (messagesToRender ?? []).filter(
+    (item) => item.textChatType === "GroupChat"
+  );
+
+  const videoChannels = (messagesToRender ?? []).filter(
+    (item) => item.textChatType === "GroupCall"
+  );
+
   function autoCaplock(str: string): string {
     return str.toUpperCase();
   }
@@ -208,7 +220,7 @@ function MessagesPage({ ...props }: ConversationProps) {
                 className="text-gray-400 hover:text-white"
                 aria-label="Đóng"
               >
-                {/* Bạn có thể thay bằng icon “X” SVG nếu muốn */}
+                {/* Bạn có thể thay bằng icon "X" SVG nếu muốn */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -247,7 +259,7 @@ function MessagesPage({ ...props }: ConversationProps) {
 
             {/* Danh sách bạn bè (sẽ render động) */}
             <div id="friendsContainer" className="max-h-64 overflow-y-auto px-6 space-y-4">
-              {/* Ta sẽ “mount” danh sách bạn bè vào đây bằng JS (xem phần script bên dưới) */}
+              {/* Ta sẽ "mount" danh sách bạn bè vào đây bằng JS (xem phần script bên dưới) */}
               <div id="loadingIndicator" className="text-gray-400 text-center py-4">
                 Đang tải danh sách bạn bè...
               </div>
@@ -326,9 +338,16 @@ function MessagesPage({ ...props }: ConversationProps) {
           {isLoading && <div>Loading...</div>}
           {error && <div>Error loading chats</div>}
 
-         
-
-          {messagesToRender.map((message) => (
+          {/* Text Channel Section */}
+          <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
+            <div className="font-bold px-4 pt-2">{autoCaplock("Text channel")}</div>
+          </div>
+          {textChannels.length === 0 && (
+            <div className="h-full flex flex-col justify-center items-center">
+              No text channels yet.
+            </div>
+          )}
+          {textChannels.map((message) => (
             <MessageItemInList
               connection={connection}
               onCurrentSelectedMessage={() =>
@@ -340,67 +359,59 @@ function MessagesPage({ ...props }: ConversationProps) {
               messageItemData={message}
             />
           ))}
-          {messagesToRender.length === 0 && (
-            // <></>}
+
+          {/* Video Channel Section */}
+          <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
+            <div className="font-bold px-4 pt-2">{autoCaplock("Video channel")}</div>
+          </div>
+          {videoChannels.length === 0 && (
             <div className="h-full flex flex-col justify-center items-center">
-              {/* <ImageWithFallback
-            className="h-24 w-24"
-            src="/assets/images/empty-message.svg"
-            alt="empty-message"
-          /> */}
-              {
-                "No messages yet. Start a conversation by sending a message to someone."
-              }
+              No video channels yet.
             </div>
           )}
-
-          <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
-            <div className="font-bold px-4 pt-2">
-              {autoCaplock("Video channel")}
-            </div>
-          </div>
-
-          <button
-            onClick={() => {
-              const videoCallUrl = `/video/${props?.conversationId}`;
-              window.open(videoCallUrl, "_blank", "width=800,height=600");
-              connection?.invoke(
-                WEB_SOCKET_EVENT.START_CALL,
-                props?.conversationId
-              );
-            }}
-          >
-            <div className="flex-col">
-              <div
-                className="text-[#80848E] group flex items-center relative mt-2 ml-[10px] p-[2px] cursor-pointer hover:bg-[#3A3C40] hover:text-[#DBDEE1] rounded-[4px] transition duration-200 ease-in-out"
-                // className="text-[#80848E] group flex items-center relative mt-2 ml-[10px] p-[2px] cursor-pointer hover:bg-[#3A3C40] hover:text-[#DBDEE1] rounded-[4px] transition duration-200 ease-in-out"
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 600,
-                }}
-              >
-                {/* Icon loa */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="22"
-                  height="22"
-                  viewBox="0 0 22 22"
-                  fill="none"
-                  className="mr-2"
+          {videoChannels.map((message) => (
+            <button
+              key={message.messageId}
+              onClick={() => {
+                const videoCallUrl = `/video/${message.messageId}`;
+                window.open(videoCallUrl, "_blank", "width=800,height=600");
+                connection?.invoke(
+                  WEB_SOCKET_EVENT.START_CALL,
+                  message.messageId
+                );
+              }}
+            >
+              <div className="flex-col">
+                <div
+                  className="text-[#80848E] group flex items-center relative mt-2 ml-[10px] p-[2px] cursor-pointer hover:bg-[#3A3C40] hover:text-[#DBDEE1] rounded-[4px] transition duration-200 ease-in-out"
+                  style={{
+                    fontSize: "16px",
+                    fontWeight: 600,
+                  }}
                 >
-                  <path
-                    d="M17.2848 4.59186C18.984 6.29158 19.9386 8.5966 19.9386 11C19.9386 13.4034 18.984 15.7084 17.2848 17.4082M14.0852 7.7914C14.9348 8.64126 15.4121 9.79377 15.4121 10.9955C15.4121 12.1972 14.9348 13.3497 14.0852 14.1996M9.97025 4.65531L5.43832 8.28085H1.81277V13.7192H5.43832L9.97025 17.3447V4.65531Z"
-                    stroke="#F5F5F5"
-                    stroke-opacity="0.4"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-                Video channel 1 
+                  {/* Icon loa */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 22 22"
+                    fill="none"
+                    className="mr-2"
+                  >
+                    <path
+                      d="M17.2848 4.59186C18.984 6.29158 19.9386 8.5966 19.9386 11C19.9386 13.4034 18.984 15.7084 17.2848 17.4082M14.0852 7.7914C14.9348 8.64126 15.4121 9.79377 15.4121 10.9955C15.4121 12.1972 14.9348 13.3497 14.0852 14.1996M9.97025 4.65531L5.43832 8.28085H1.81277V13.7192H5.43832L9.97025 17.3447V4.65531Z"
+                      stroke="#F5F5F5"
+                      strokeOpacity="0.4"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  {message.name}
+                </div>
               </div>
-            </div>
-          </button>
+            </button>
+          ))}
         </div>
       </div>
       <div className="w-[1130px]">

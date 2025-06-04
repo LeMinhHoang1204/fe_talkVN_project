@@ -20,6 +20,9 @@ export type GetConversationListItemRES = {
   lastMessage: MessageRES | null;
   isSeen: boolean;
   userReceiverIds: { id: string; displayName: string; avatarUrl: string }[];
+  textChatType: string;
+  name: string;
+  groupId: string;
 };
 
 export type GetConversationFoundByUsernameListItemRES = {
