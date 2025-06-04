@@ -37,7 +37,12 @@ function MessagesPage({ ...props }: ConversationProps) {
   const { groupId } = useParams();
   const isGroupChat = !!groupId;
 
-  const { data: messageListData, refetch, isLoading, error } = useGetConversationListQuery({
+  const {
+    data: messageListData,
+    refetch,
+    isLoading,
+    error,
+  } = useGetConversationListQuery({
     PageIndex: 1,
     PageSize: GET_CONVERSATION_LIST_PAGE_SIZE,
     groupId: isGroupChat ? groupId : undefined, // Truyền groupId
@@ -62,7 +67,8 @@ function MessagesPage({ ...props }: ConversationProps) {
   const [searchedUsers, setSearchedUsers] = useState<UserDTO[]>([]);
 
   const [inviteLink, setInviteLink] = useState("");
-  const [createInvitation, { isLoading: invitationLoading }] = useCreateInvitationMutation();
+  const [createInvitation, { isLoading: invitationLoading }] =
+    useCreateInvitationMutation();
 
   const textChannels = (messagesToRender ?? []).filter(
     (item) => item.textChatType === "GroupChat"
@@ -161,9 +167,13 @@ function MessagesPage({ ...props }: ConversationProps) {
     }
   };
 
-  const groupCalls = (messageListData?.data ?? []).filter(chat => chat.textChatType === "GroupCall");
-  const groupChats = (messageListData?.data ?? []).filter(chat => chat.textChatType === "GroupChat");
-  
+  const groupCalls = (messageListData?.data ?? []).filter(
+    (chat) => chat.textChatType === "GroupCall"
+  );
+  const groupChats = (messageListData?.data ?? []).filter(
+    (chat) => chat.textChatType === "GroupChat"
+  );
+
   const [showInviteModal, setShowInviteModal] = useState(false);
 
   // Handler for clicking "Thêm thành viên"
@@ -199,7 +209,7 @@ function MessagesPage({ ...props }: ConversationProps) {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       try {
-        console.log('dang goi api search');
+        console.log("dang goi api search");
         const res = await axios.get("/api/Group/search-by-usernames", {
           params: {
             usernames: search,
@@ -222,7 +232,7 @@ function MessagesPage({ ...props }: ConversationProps) {
   // Send invite handler
   const handleInvite = async (targetUserId: string) => {
     try {
-      console.log('dang goi api');
+      console.log("dang goi api");
       await axios.post("/api/Group/send-invite", {
         groupId,
         targetUserId,
@@ -238,134 +248,161 @@ function MessagesPage({ ...props }: ConversationProps) {
     <div className="flex flex-row w-300px h-full bg-[#2B2D31]">
       <div className="flex flex-col md:w-[310px] h-full overflow-auto">
         <div className="box-border flex items-center justify-between h-[70px] px-4 py-3 border-b-[2px] border-black/50">
-          <span className="font-bold text-white flex justify-start items-center w-full pl-4 text-lg">
+          <span className="font-bold text-white  justify-start items-center w-full pl-4 text-lg flex p">
             {isGroupChat ? "Group Chat" : "Messages"}
           </span>
-          <button
-            onClick={handleAddMemberClick}
-            style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
-            aria-label="Thêm thành viên"
-          >
-            <svg
-              className=""
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 22 22"
-              fill="none"
+
+          <span className="relative group/icon flex items-center pr-10">
+            <button
+              onClick={handleAddMemberClick}
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+              }}
+              aria-label="Thêm thành viên"
             >
-              <path
-                d="M17.2848 4.59186C18.984 6.29158 19.9386 8.5966 19.9386 11C19.9386 13.4034 18.984 15.7084 17.2848 17.4082M14.0852 7.7914C14.9348 8.64126 15.4121 9.79377 15.4121 10.9955C15.4121 12.1972 14.9348 13.3497 14.0852 14.1996M9.97025 4.65531L5.43832 8.28085H1.81277V13.7192H5.43832L9.97025 17.3447V4.65531Z"
-                stroke="#F5F5F5"
-                strokeOpacity="0.4"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+              <svg
+                className=""
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 22 22"
+                fill="none"
+              >
+                <g clip-path="url(#clip0_153_103)">
+                  <path
+                    d="M14.6667 19.25V17.4167C14.6667 16.4442 14.2804 15.5116 13.5927 14.8239C12.9051 14.1363 11.9725 13.75 11 13.75H4.58335C3.61089 13.75 2.67826 14.1363 1.99063 14.8239C1.303 15.5116 0.916687 16.4442 0.916687 17.4167V19.25M18.3334 7.33333V12.8333M21.0834 10.0833H15.5834M11.4584 6.41667C11.4584 8.44171 9.81673 10.0833 7.79169 10.0833C5.76664 10.0833 4.12502 8.44171 4.12502 6.41667C4.12502 4.39162 5.76664 2.75 7.79169 2.75C9.81673 2.75 11.4584 4.39162 11.4584 6.41667Z"
+                    stroke="#DBDEE1"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </g>
+                <defs>
+                  <clipPath id="clip0_153_103">
+                    <rect width="20" height="20" fill="white" />
+                  </clipPath>
+                </defs>
+              </svg>
+              <div
+                className="absolute top-full mt-4 left-1/4 -translate-x-1/2 border border-[#B5BAC1]  mb-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block"
+                style={{ fontSize: "11px" }}
+              >
+                Thêm thành viên
+              </div>
+            </button>
+          </span>
         </div>
 
         {showInviteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          {/* Container chính của pop-up */}
-          <div className="bg-gray-800 rounded-lg w-full max-w-md mx-4 shadow-lg">
-
-            {/* Dòng ngang chứa nút đóng ở góc phải */}
-            <div className="flex justify-end p-2">
-              <button
-                onClick={() => setShowInviteModal(false)}
-                className="text-gray-400 hover:text-white"
-                aria-label="Đóng"
-              >
-                {/* Bạn có thể thay bằng icon "X" SVG nếu muốn */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            {/* Header (Tiêu đề + kênh) */}
-            {/* Them thanh vien vao group */}
-            <div className="px-6 py-2 border-b border-gray-700">
-              <h2 className="text-white text-lg font-semibold">
-                Mời bạn bè vào nhóm
-              </h2>
-              <p className="text-gray-400 text-sm mt-1"># chào-mừng-và-nội-quy</p>
-            </div>
-
-            {/* Input tìm kiếm bạn bè */}
-            <div className="px-6 py-4">
-              <input
-                id="searchInput"
-                type="text"
-                placeholder="Tìm kiếm bạn bè"
-                className="w-full px-4 py-2 bg-gray-700 text-white rounded-md placeholder-gray-400
-                           focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-
-            {/* Danh sách bạn bè (sẽ render động) */}
-            <div id="friendsContainer" className="max-h-64 overflow-y-auto px-6 space-y-4">
-              {/* Ta sẽ "mount" danh sách bạn bè vào đây bằng JS (xem phần script bên dưới) */}
-              {loading && <div>Đang tải danh sách bạn bè...</div>}
-              {users.map(user => (
-                <div key={user.id} className="flex justify-between items-center py-2 border-b border-gray-600">
-                  <span>{user.username}</span>
-                  <button
-                    onClick={() => handleInvite(user.id)}
-                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                    Mời
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            {/* Phần gửi link mời */}
-            <div className="px-6 py-4 border-t border-gray-700">
-              <label className="block text-gray-400 text-sm mb-2">
-                Gửi lời mời cho bạn bè
-              </label>
-              <div className="flex items-center space-x-2">
-                <input
-                  id="inviteLinkInput"
-                  type="text"
-                  value={inviteLink}
-                  readOnly
-                  className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-md focus:outline-none"
-                />
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            {/* Container chính của pop-up */}
+            <div className="bg-gray-800 rounded-lg w-full max-w-md mx-4 shadow-lg">
+              {/* Dòng ngang chứa nút đóng ở góc phải */}
+              <div className="flex justify-end p-2">
                 <button
-                  id="copyInviteBtn"
-                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                  onClick={() => setShowInviteModal(false)}
+                  className="text-gray-400 hover:text-white"
+                  aria-label="Đóng"
                 >
-                  Sao chép
+                  {/* Bạn có thể thay bằng icon "X" SVG nếu muốn */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
                 </button>
               </div>
-              <p className="text-gray-500 text-xs mt-2">
-                Link mới của bạn sẽ hết hạn sau 7 ngày.{" "}
-              </p>
+
+              {/* Header (Tiêu đề + kênh) */}
+              {/* Them thanh vien vao group */}
+              <div className="px-6 py-2 border-b border-gray-700">
+                <h2 className="text-white text-lg font-semibold">
+                  Mời bạn bè vào nhóm
+                </h2>
+                <p className="text-gray-400 text-sm mt-1">
+                  # chào-mừng-và-nội-quy
+                </p>
+              </div>
+
+              {/* Input tìm kiếm bạn bè */}
+              <div className="px-6 py-4">
+                <input
+                  id="searchInput"
+                  type="text"
+                  placeholder="Tìm kiếm bạn bè"
+                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-md placeholder-gray-400
+                           focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+
+              {/* Danh sách bạn bè (sẽ render động) */}
+              <div
+                id="friendsContainer"
+                className="max-h-64 overflow-y-auto px-6 space-y-4"
+              >
+                {/* Ta sẽ "mount" danh sách bạn bè vào đây bằng JS (xem phần script bên dưới) */}
+                {loading && <div>Đang tải danh sách bạn bè...</div>}
+                {users.map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex justify-between items-center py-2 border-b border-gray-600"
+                  >
+                    <span>{user.username}</span>
+                    <button
+                      onClick={() => handleInvite(user.id)}
+                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                      Mời
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* Phần gửi link mời */}
+              <div className="px-6 py-4 border-t border-gray-700">
+                <label className="block text-gray-400 text-sm mb-2">
+                  Gửi lời mời cho bạn bè
+                </label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    id="inviteLinkInput"
+                    type="text"
+                    value={inviteLink}
+                    readOnly
+                    className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-md focus:outline-none"
+                  />
+                  <button
+                    id="copyInviteBtn"
+                    className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                  >
+                    Sao chép
+                  </button>
+                </div>
+                <p className="text-gray-500 text-xs mt-2">
+                  Link mới của bạn sẽ hết hạn sau 7 ngày.{" "}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
         {/* <div className="w-full h-auto">
           <div className="flex flex-row justify-between px-2"> */}
-            {/* <div className="flex flex-col gap-2 px-2 py-2">
+        {/* <div className="flex flex-col gap-2 px-2 py-2">
               <div className="flex flex-row justify-between items-center">
                 <UserNameDisplay
                   id={userInfo.userId}
@@ -374,8 +411,8 @@ function MessagesPage({ ...props }: ConversationProps) {
                 />
               </div> */}
 
-              {/* Tim chat */}
-              {/* <input
+        {/* Tim chat */}
+        {/* <input
                 type="text"
                 list="usernames"
                 placeholder="Nhập @username để bắt đầu chat"
@@ -393,11 +430,13 @@ function MessagesPage({ ...props }: ConversationProps) {
                 <option value="admin1" />
               </datalist>
             </div> */}
-          {/* </div>
+        {/* </div>
         </div> */}
 
         <div className="flex flex-row pl-5 pr-2 py-2 overflow-y-auto text-[#80848E]">
-          <div className="w-full font-bold pL-4 py-2 border-b-[2px] border-[#80848E] justify-between items-center ">{autoCaplock("Channels")}</div>
+          <div className="w-full font-bold pL-4 py-2 border-b-[2px] border-[#80848E] justify-between items-center ">
+            {autoCaplock("Channels")}
+          </div>
         </div>
 
         {/* A message is a conversation */}
@@ -407,10 +446,24 @@ function MessagesPage({ ...props }: ConversationProps) {
 
           {/* Text Channel Section */}
           <div className="flex flex-row px-4 overflow-y-auto text-[#80848E] justify-between items-center">
-            <div className="font-bold px-4 pt-2">{autoCaplock("Text channel")}</div>
+            <div className="font-bold px-4 pt-2">
+              {autoCaplock("Text channel")}
+            </div>
             <div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none">
-                <path d="M24 10V38M10 24H38" stroke="#B5BAC1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 48 48"
+                fill="none"
+              >
+                <path
+                  d="M24 10V38M10 24H38"
+                  stroke="#B5BAC1"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </div>
           </div>
@@ -434,10 +487,24 @@ function MessagesPage({ ...props }: ConversationProps) {
 
           {/* Video Channel Section */}
           <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E] justify-between items-center">
-            <div className="font-bold px-4 pt-2">{autoCaplock("Video channel")}</div>
+            <div className="font-bold px-4 pt-2">
+              {autoCaplock("Video channel")}
+            </div>
             <div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none">
-                <path d="M24 10V38M10 24H38" stroke="#B5BAC1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 48 48"
+                fill="none"
+              >
+                <path
+                  d="M24 10V38M10 24H38"
+                  stroke="#B5BAC1"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </div>
           </div>
