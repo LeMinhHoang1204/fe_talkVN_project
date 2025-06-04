@@ -123,9 +123,9 @@ function MessageItemInList({
           {messageItemData.name}
 
           {/* Icon hover */}
-          <span className="absolute right-0 flex items-center mr-4 gap-1 opacity-0 group-hover:opacity-100">
+          {/* <span className="absolute right-0 flex items-center mr-4 gap-1 opacity-0 group-hover:opacity-100"> */}
             {/* Add user icon */}
-            <span className="relative group/icon flex items-center">
+            {/* <span className="relative group/icon flex items-center">
               <svg
                 className=""
                 xmlns="http://www.w3.org/2000/svg"
@@ -155,10 +155,10 @@ function MessageItemInList({
               >
                 Thêm thành viên
               </div>
-            </span>
+            </span> */}
 
             {/* Setting icon */}
-            <span className="relative group/icon flex items-center">
+            {/* <span className="relative group/icon flex items-center">
               <svg
                 className=""
                 xmlns="http://www.w3.org/2000/svg"
@@ -202,7 +202,7 @@ function MessageItemInList({
                 Cài đặt
               </div>
             </span>
-          </span>
+          </span> */}
         </div>
 
         {/* <div

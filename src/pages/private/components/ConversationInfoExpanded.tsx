@@ -283,26 +283,16 @@ function ConversationInfoExpanded({
   return (
     <div
       className={twMerge(
-        "font-roboto flex flex-col bg-[#2b2d31] w-[42%]  text-white shadow-lg px-4 py-4",
+        "flex flex-col bg-[#2b2d31] w-[40%] text-white shadow-lg py-2 justify-between h-full z-50 transition-all duration-300",
         !isShow && "hidden"
       )}
       style={{ fontFamily: "'Roboto', sans-serif" }}
     >
-      <div className="font-semibold mr-[45px] text-lg tracking-wide border-b border-gray-700 pb-1 mb-6 leading-9">
-        {" "}
+      <div className="font-semibold text-lg box-border flex items-center justify-between h-[80px] px-4 py-3 border-b-[2px] border-black/50">
         Detail Members
       </div>
       <div
-        className="bg-[#2B2D31] text-white p-4 custom-scrollbar cursor-pointer"
-        style={{
-          width: "350px",
-          height: "calc(100vh - 60px)",
-          position: "fixed",
-          top: "60px",
-          right: 0,
-          overflowY: "scroll",
-          flexShrink: 0,
-        }}
+        className="bg-[#2B2D31] text-white p-4 custom-scrollbar cursor-pointer w-full overflow-y-auto"  
       >
         <p className="text-xs font-semibold text-gray-400 mb-2  ">
           ADMIN - {admins.length}

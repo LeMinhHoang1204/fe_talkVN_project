@@ -57,7 +57,7 @@ const groupApi = usersApi.injectEndpoints({
       transformResponse: (response: BaseResponse<getGroupChannelsResponse>) => response.result,
     }),
 
-    createInvitation: build.mutation<{ url: string }, { groupId: string }>({
+    createInvitation: build.mutation<{ result: { invitationUrl: string } }, { groupId: string }>({
       query: ({ groupId }) => ({
         url: `/Group/create-invitation`,
         method: 'POST',
