@@ -4,7 +4,6 @@ import {
   HubConnectionBuilder,
   LogLevel,
 } from "@microsoft/signalr";
-import axios from "axios";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -15,10 +14,10 @@ import {
   GET_CONVERSATION_LIST_PAGE_SIZE,
   useCreateConversationByUsernameMutation,
   useGetConversationListQuery,
-  useLazyGetConversationListByUsernameQuery,
+  useLazyGetConversationListByUsernameQuery
 } from "../../../data/conversation/conversation.api";
 import { GlobalState } from "../../../data/global/global.slice";
-import { useCreateInvitationMutation } from "../../../data/group/group.api.ts"; // adjust path as needed
+import { useCreateInvitationMutation, useLazySearchGroupByUsernamesQuery, useSendInviteMutation } from "../../../data/group/group.api.ts"; // adjust path as needed
 import { socketBaseUrl } from "../../../helpers/constants/configs.constant";
 import { WEB_SOCKET_EVENT } from "../../../helpers/constants/websocket-event.constant";
 import { useAppSelector } from "../../../hooks/reduxHooks";
@@ -67,8 +66,9 @@ function MessagesPage({ ...props }: ConversationProps) {
   const [searchedUsers, setSearchedUsers] = useState<UserDTO[]>([]);
 
   const [inviteLink, setInviteLink] = useState("");
-  const [createInvitation, { isLoading: invitationLoading }] =
-    useCreateInvitationMutation();
+  const [createInvitation, { isLoading: invitationLoading }] = useCreateInvitationMutation();
+
+  const [sendInvite] = useSendInviteMutation();
 
   const textChannels = (messagesToRender ?? []).filter(
     (item) => item.textChatType === "GroupChat"
@@ -193,54 +193,36 @@ function MessagesPage({ ...props }: ConversationProps) {
     }
   };
 
+  const [triggerSearch, { data: users = [], isFetching }] = useLazySearchGroupByUsernamesQuery();
   const [search, setSearch] = useState("");
-  type SearchUser = { id: string; username: string };
-  const [users, setUsers] = useState<SearchUser[]>([]);
-  const [loading, setLoading] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Debounced search effect
   useEffect(() => {
-    if (!search) {
-      setUsers([]);
-      return;
-    }
-    setLoading(true);
+    if (!search) return;
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(async () => {
-      try {
-        console.log("dang goi api search");
-        const res = await axios.get("/api/Group/search-by-usernames", {
-          params: {
-            usernames: search,
-            PageIndex: 1,
-            PageSize: 10,
-          },
-        });
-        setUsers(Array.isArray(res.data) ? res.data : []);
-      } catch (err) {
-        setUsers([]);
-      } finally {
-        setLoading(false);
-      }
-    }, 500); // 500ms debounce
+    debounceRef.current = setTimeout(() => {
+      triggerSearch({ usernames: search, PageIndex: 1, PageSize: 10 });
+      console.log('dang goi api search 2', users);
+    }, 500);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [search]);
+  }, [search, triggerSearch]);
 
   // Send invite handler
   const handleInvite = async (targetUserId: string) => {
+    if (!groupId) {
+      alert("Không tìm thấy groupId.");
+      return;
+    }
+    const payload = { groupId, targetUserId, senderUserId: userInfo.userId };
+    console.log("Sending invite payload:", payload);
     try {
-      console.log("dang goi api");
-      await axios.post("/api/Group/send-invite", {
-        groupId,
-        targetUserId,
-        senderUserId: userInfo.userId,
-      });
+      await sendInvite(payload).unwrap();
       alert("Invite sent!");
     } catch (err) {
       alert("Failed to send invite");
+      console.error("Invite error:", err);
     }
   };
 
@@ -349,28 +331,22 @@ function MessagesPage({ ...props }: ConversationProps) {
                 />
               </div>
 
-              {/* Danh sách bạn bè (sẽ render động) */}
-              <div
-                id="friendsContainer"
-                className="max-h-64 overflow-y-auto px-6 space-y-4"
-              >
-                {/* Ta sẽ "mount" danh sách bạn bè vào đây bằng JS (xem phần script bên dưới) */}
-                {loading && <div>Đang tải danh sách bạn bè...</div>}
-                {users.map((user) => (
-                  <div
-                    key={user.id}
-                    className="flex justify-between items-center py-2 border-b border-gray-600"
+            {/* Danh sách bạn bè (sẽ render động) */}
+            <div id="friendsContainer" className="max-h-64 overflow-y-auto px-6 space-y-4">
+              {/* Ta sẽ "mount" danh sách bạn bè vào đây bằng JS (xem phần script bên dưới) */}
+              {isFetching && <div>Đang tải danh sách bạn bè...</div>}
+              {Array.isArray(users) && users.map(user => (
+                <div key={user.id} className="flex justify-between items-center py-2 border-b border-gray-600">
+                  <span>{user.displayName}</span>
+                  <button
+                    onClick={() => handleInvite(user.id)}
+                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
                   >
-                    <span>{user.username}</span>
-                    <button
-                      onClick={() => handleInvite(user.id)}
-                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                      Mời
-                    </button>
-                  </div>
-                ))}
-              </div>
+                    Mời
+                  </button>
+                </div>
+              ))}
+            </div>
 
               {/* Phần gửi link mời */}
               <div className="px-6 py-4 border-t border-gray-700">
