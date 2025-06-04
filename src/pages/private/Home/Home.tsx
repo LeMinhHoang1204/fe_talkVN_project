@@ -20,7 +20,7 @@ const Home = () => {
           <div className="bg-black bg-opacity-65 rounded-[40px] p-5 text-white text-center shadow-lg">
             <h1 className="text-5xl font-bold mb-4">TalkVN</h1>
             <p className="text-xl">
-              Fun group chat and meeting <br /> (Chưa fix lên trên được)
+              Fun group chat and meeting
             </p>
           </div>
         </div>

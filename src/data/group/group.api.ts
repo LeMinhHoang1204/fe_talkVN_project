@@ -4,6 +4,18 @@ import { usersApi } from "../usersApi.api";
 import { GetGroupRequest } from "./group.req";
 import { CreateGroupRequest, GroupData, createGroupResponse, getAllGroupResponse, getGroupByInvitationCodeResponse, getGroupChannelsResponse } from "./group.res";
 
+// Định nghĩa kiểu dữ liệu trả về từ API
+export interface UserGroupDto {
+  userId: string;
+  user: {
+    id: string;
+    displayName: string;
+    avatarUrl: string;
+  };
+  groupId: string;
+  status: number;
+}
+
 const groupApi = usersApi.injectEndpoints({
   endpoints: (build) => ({
     getAllGroups: build.query<getAllGroupResponse, { pageIndex?: number; pageSize?: number }>({
@@ -64,6 +76,15 @@ const groupApi = usersApi.injectEndpoints({
         params: { groupId },
       }),
     }),
+
+    getGroupMembers: build.query<UserGroupDto[], { groupId: string }>({
+      query: ({ groupId }) => ({
+        url: `/group/get-members`,
+        method: "GET",
+        params: { groupId },
+      }),
+      transformResponse: (response: BaseResponse<UserGroupDto[]>) => response.result,
+    }),
   }),
 });
 
@@ -75,4 +96,6 @@ export const {
   useGetGroupByInvitationCodeQuery,
   useGetGroupChannelsQuery,
   useCreateInvitationMutation,
+  useGetGroupMembersQuery,
+  useLazyGetGroupMembersQuery,
 } = groupApi;

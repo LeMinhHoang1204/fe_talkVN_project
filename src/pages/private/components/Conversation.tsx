@@ -5,10 +5,11 @@ import ImageWithFallback from "../../../components/ImageWithFallback";
 import { Modal } from "../../../components/Modal";
 import {
   useGetConversationDetailQuery,
-  useLazyGetConversationInformationQuery,
+  useLazyGetConversationInformationQuery
 } from "../../../data/conversation/conversation.api";
 import { MessageRES } from "../../../data/conversation/conversation.res";
 import { GlobalState } from "../../../data/global/global.slice";
+import { useLazyGetGroupMembersQuery } from "../../../data/group/group.api";
 import { WEB_SOCKET_EVENT } from "../../../helpers/constants/websocket-event.constant";
 import { getActiveTime } from "../../../helpers/format/date-time.format";
 import { useAppSelector } from "../../../hooks/reduxHooks";
@@ -21,11 +22,13 @@ import ChatInput from "./ChatInput";
 import ConversationInfoExpanded from "./ConversationInfoExpanded";
 import Message from "./Message";
 
+
 type ConversationProps = {
   conversationId: string;
   chatter: UserDTO[];
   lastChatterActiveTime: number;
   connection: HubConnection | null;
+  groupId?: string;
 };
 
 function Conversation({
@@ -33,6 +36,7 @@ function Conversation({
   lastChatterActiveTime,
   conversationId,
   connection,
+  groupId,
 }: ConversationProps) {
   const { userInfo }: GlobalState = useAppSelector((state) => state.global);
 
@@ -144,6 +148,22 @@ function Conversation({
     useState<ConversationInformationDTO | null>(null);
 
   const [isVideoCallActive, setIsVideoCallActive] = useState<boolean>(false);
+
+  // Thêm state để lưu member
+  const [members, setMembers] = useState<any[]>([]);
+  const [getGroupMembers, { data: groupMembers }] = useLazyGetGroupMembersQuery();
+
+  useEffect(() => {
+    if (groupId) {
+      getGroupMembers({ groupId });
+    }
+  }, [groupId, getGroupMembers]);
+
+  useEffect(() => {
+    if (groupMembers) {
+      setMembers(groupMembers);
+    }
+  }, [groupMembers]);
 
 
   return (
@@ -337,7 +357,11 @@ function Conversation({
           }
         />
       </div>
-      <ConversationInfoExpanded isShow={isShowConversationInfoExpanded} textChatType={"GroupChat"} />
+      <ConversationInfoExpanded
+        isShow={isShowConversationInfoExpanded}
+        textChatType={"GroupChat"}
+        members={members}
+      />
     </div>
   );
 }

@@ -494,6 +494,7 @@ function MessagesPage({ ...props }: ConversationProps) {
       <div className="w-[1130px]">
         {chatter && (
           <Conversation
+            groupId={groupId}
             connection={connection}
             lastChatterActiveTime={Date.now()}
             chatter={chatter}

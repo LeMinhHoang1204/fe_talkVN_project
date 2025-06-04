@@ -3,26 +3,9 @@ import { twMerge } from "tailwind-merge";
 type ConversationInfoExpandedProps = {
   isShow: boolean;
   textChatType: "GroupChat" | "GroupCall";
+  members: any[]; // nhận từ props
 };
 
-export const generateMembers = () => [
-  {
-    id: 0,
-    name: "KeThongTriLoaiBo",
-    avatar: "/avatar1.png",
-    email: "admin@example.com",
-    phone: "111-111-1111",
-    isAdmin: true,
-  },
-  ...Array.from({ length: 15 }, (_, index) => ({
-    id: index + 1,
-    name: `Bò ${index + 1}`,
-    avatar: `/avatar${(index % 5) + 1}.png`,
-    email: `bo${index + 1}@example.com`,
-    phone: `123-456-789${index % 10}`,
-    isAdmin: false,
-  })),
-];
 // list kênh tĩnh frontend
 const channels = [
   "General",
@@ -33,29 +16,22 @@ const channels = [
   "Music",
 ];
 export interface Member {
-  id: number;
+  id: string; 
   name: string;
   avatar: string;
-  email: string;
-  phone: string;
-  isAdmin: boolean;
 }
 
 function ConversationInfoExpanded({
   isShow,
   textChatType,
+  members = [],
 }: ConversationInfoExpandedProps) {
-  const members = generateMembers();
-  const [hoveredMemberId, setHoveredMemberId] = useState<number | null>(null);
-  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  const [hoveredMemberId, setHoveredMemberId] = useState<string | null>(null); // đổi sang string
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);   // đổi sang string
 
   // State popup phân quyền và hạn chế
-  const [rolePopupMemberId, setRolePopupMemberId] = useState<number | null>(
-    null
-  );
-  const [restrictPopupMemberId, setRestrictPopupMemberId] = useState<
-    number | null
-  >(null);
+  const [rolePopupMemberId, setRolePopupMemberId] = useState<string | null>(null); // đổi sang string
+  const [restrictPopupMemberId, setRestrictPopupMemberId] = useState<string | null>(null); // đổi sang string
 
   const [restrictOptions, setRestrictOptions] = useState<string[]>([]);
   const groupChatOptions = [
@@ -86,16 +62,16 @@ function ConversationInfoExpanded({
   const [restrictAllChannels, setRestrictAllChannels] = useState(false);
   const [restrictedChannels, setRestrictedChannels] = useState<string[]>([]);
 
-  const dropdownRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const dropdownRefs = useRef<Map<string, HTMLDivElement>>(new Map()); // đổi sang string
 
-  const toggleDropdown = (id: number) => {
+  const toggleDropdown = (id: string) => { // đổi sang string
     setOpenDropdownId((prev) => (prev === id ? null : id));
     setRolePopupMemberId(null);
     setRestrictPopupMemberId(null);
   };
 
   // Mở popup phân quyền
-  const onClickRole = (memberId: number) => {
+  const onClickRole = (memberId: string) => { // đổi sang string
     setRolePopupMemberId(memberId);
     setRestrictPopupMemberId(null);
     setOpenDropdownId(null);
@@ -103,7 +79,7 @@ function ConversationInfoExpanded({
   };
 
   // Mở popup hạn chế tin nhắn
-  const onClickRestrict = (memberId: number) => {
+  const onClickRestrict = (memberId: string) => { // đổi sang string
     setRestrictPopupMemberId(memberId);
     setRolePopupMemberId(null);
     setOpenDropdownId(null);
@@ -118,20 +94,18 @@ function ConversationInfoExpanded({
     <div
       key={member.id}
       className="relative mb-3 group"
-      onMouseEnter={() => setHoveredMemberId(member.id)}
-      onMouseLeave={() => setHoveredMemberId(null)}
+      // onMouseEnter={() => setHoveredMemberId(member.id)}
+      // onMouseLeave={() => setHoveredMemberId(null)}
     >
       <div className="flex items-center justify-between p-[4px] group-hover:bg-[#3A3C40] rounded-[4px] transition duration-200 ease-in-out">
         <div className="flex items-center gap-2">
           <img
             src={member.avatar}
-            alt={member.name}
             className="w-8 h-8 rounded-full"
           />
-          <span className="text-[#80848E] group-hover:text-[#DBDEE1]">
+          <span className="text-[#80848E] group-hover:text-[#DBDEE1] truncate max-w-[120px]">
             {member.name}
           </span>
-          {member.isAdmin && <span className="text-yellow-400">👑</span>}
         </div>
 
         <div
@@ -265,15 +239,18 @@ function ConversationInfoExpanded({
       {hoveredMemberId === member.id && (
         <div className="absolute left-0 top-full mt-2 w-full z-10 bg-[#1a1a1d] text-white p-2 rounded shadow-lg">
           <h4 className="font-semibold text-sm mb-1">{member.name}</h4>
-          <p className="text-xs">Email: {member.email}</p>
-          <p className="text-xs">Phone: {member.phone}</p>
         </div>
       )}
     </div>
   );
 
-  const admins = members.filter((m) => m.isAdmin);
-  const regularMembers = members.filter((m) => !m.isAdmin);
+  // Chuyển đổi dữ liệu từ API sang format cũ nếu cần
+  const mappedMembers = members.map((m) => ({
+    id: m.userId,
+    name: m.user.displayName,
+    avatar: m.user.avatarUrl
+  }));
+
   useEffect(() => {
     if (!isHoverRoleTrigger && !isHoverRolePopup) {
       setRolePopupMemberId(null);
@@ -283,7 +260,7 @@ function ConversationInfoExpanded({
   return (
     <div
       className={twMerge(
-        "flex flex-col bg-[#2b2d31] w-[40%] text-white shadow-lg py-2 justify-between h-full z-50 transition-all duration-300",
+        "flex flex-col bg-[#2b2d31] w-[40%] text-white shadow-lg py-2 h-full z-50 transition-all duration-300",
         !isShow && "hidden"
       )}
       style={{ fontFamily: "'Roboto', sans-serif" }}
@@ -292,17 +269,13 @@ function ConversationInfoExpanded({
         Detail Members
       </div>
       <div
-        className="bg-[#2B2D31] text-white p-4 custom-scrollbar cursor-pointer w-full overflow-y-auto"  
+        className="bg-[#2B2D31] text-white p-4 custom-scrollbar cursor-pointer w-full overflow-y-auto flex-1"
+        style={{ minHeight: 0 }}
       >
-        <p className="text-xs font-semibold text-gray-400 mb-2  ">
-          ADMIN - {admins.length}
+        <p className="text-xs font-semibold text-gray-400 mb-2">
+          MEMBER - {mappedMembers.length}
         </p>
-        {admins.map(renderMemberItem)}
-
-        <p className="text-xs font-semibold text-gray-400 mb-2 mt-4 ">
-          MEMBER - {regularMembers.length}
-        </p>
-        {regularMembers.map(renderMemberItem)}
+        {mappedMembers.map(renderMemberItem)}
       </div>
     </div>
   );
