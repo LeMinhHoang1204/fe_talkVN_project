@@ -1,4 +1,9 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { twMerge } from "tailwind-merge";
+
+type ConversationInfoExpandedProps = {
+  isShow: boolean;
+};
 
 export const generateMembers = () => [
   {
@@ -19,7 +24,6 @@ export const generateMembers = () => [
   })),
 ];
 
-// list kênh tĩnh frontend
 const channels = [
   "General",
   "Random",
@@ -38,44 +42,21 @@ export interface Member {
   isAdmin: boolean;
 }
 
-const RightSidebarGrChat: React.FC = () => {
+function ConversationInfoExpanded({ isShow }: ConversationInfoExpandedProps) {
   const members = generateMembers();
   const [hoveredMemberId, setHoveredMemberId] = useState<number | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
-
-  // State popup phân quyền và hạn chế
   const [rolePopupMemberId, setRolePopupMemberId] = useState<number | null>(
     null
   );
   const [restrictPopupMemberId, setRestrictPopupMemberId] = useState<
     number | null
   >(null);
-
-  // State chọn role trong popup phân quyền
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
-
-  // State hạn chế tin nhắn
   const [restrictAllChannels, setRestrictAllChannels] = useState(false);
-  const [restrictedChannel, setRestrictedChannel] = useState<string>("");
+  const [restrictedChannels, setRestrictedChannels] = useState<string[]>([]);
 
   const dropdownRefs = useRef<Map<number, HTMLDivElement>>(new Map());
-
-  // useEffect(() => {
-  //   const handleClickOutside = (event: MouseEvent) => {
-  //     // Đóng dropdown khi click ngoài
-  //     for (const [id, ref] of dropdownRefs.current.entries()) {
-  //       if (ref && !ref.contains(event.target as Node)) {
-  //         setOpenDropdownId((prevId) => (prevId === id ? null : prevId));
-  //         setRolePopupMemberId(null);
-  //         setRestrictPopupMemberId(null);
-  //       }
-  //     }
-  //   };
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, []);
 
   const toggleDropdown = (id: number) => {
     setOpenDropdownId((prev) => (prev === id ? null : id));
@@ -83,7 +64,6 @@ const RightSidebarGrChat: React.FC = () => {
     setRestrictPopupMemberId(null);
   };
 
-  // Mở popup phân quyền
   const onClickRole = (memberId: number) => {
     setRolePopupMemberId(memberId);
     setRestrictPopupMemberId(null);
@@ -91,13 +71,12 @@ const RightSidebarGrChat: React.FC = () => {
     setSelectedRole(null);
   };
 
-  // Mở popup hạn chế tin nhắn
   const onClickRestrict = (memberId: number) => {
     setRestrictPopupMemberId(memberId);
     setRolePopupMemberId(null);
     setOpenDropdownId(null);
     setRestrictAllChannels(false);
-    setRestrictedChannel("");
+    setRestrictedChannels([]);
   };
 
   const renderMemberItem = (member: Member) => (
@@ -107,17 +86,20 @@ const RightSidebarGrChat: React.FC = () => {
       onMouseEnter={() => setHoveredMemberId(member.id)}
       onMouseLeave={() => setHoveredMemberId(null)}
     >
-      <div className="flex items-center justify-between p-[4px] group-hover:bg-[#3A3C40] rounded-[4px] transition duration-200 ease-in-out">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between p-3 rounded-md group-hover:bg-[#3b3d43] transition-colors duration-300 ease-in-out cursor-default">
+        <div className="flex items-center gap-3">
           <img
             src={member.avatar}
             alt={member.name}
-            className="w-8 h-8 rounded-full"
+            className="w-10 h-10 rounded-full object-cover border-2 border-gray-600"
           />
-          <span className="text-[#80848E] group-hover:text-[#DBDEE1]">
-            {member.name}
-          </span>
-          {member.isAdmin && <span className="text-yellow-400">👑</span>}
+          <div>
+            <p className="text-white font-medium text-sm tracking-wide">
+              {member.name}{" "}
+              {member.isAdmin && <span className="text-yellow-400">👑</span>}
+            </p>
+            <p className="text-gray-400 text-xs select-none">{member.email}</p>
+          </div>
         </div>
 
         <div
@@ -128,7 +110,7 @@ const RightSidebarGrChat: React.FC = () => {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="size-6 text-gray-400 hover:text-white cursor-pointer"
+            className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer transition-colors"
             onClick={() => toggleDropdown(member.id)}
           >
             <path
@@ -138,20 +120,20 @@ const RightSidebarGrChat: React.FC = () => {
             />
           </svg>
 
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block">
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 px-3 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block select-none">
             Cài đặt
           </div>
 
           {openDropdownId === member.id && (
-            <div className="absolute right-0 top-7 bg-[#1F1F1F] text-white shadow-md rounded w-40 z-20 py-2 border border-gray-700">
+            <div className="absolute right-0 top-7 bg-[#222222] text-white shadow-lg rounded-md w-44 z-20 py-2 border border-gray-700">
               <div
-                className="px-4 py-1 hover:bg-[#3A3C40] cursor-pointer text-sm"
+                className="px-4 py-2 hover:bg-[#3A3C40] cursor-pointer text-sm transition"
                 onClick={() => onClickRole(member.id)}
               >
                 Phân quyền
               </div>
               <div
-                className="px-4 py-1 hover:bg-[#3A3C40] cursor-pointer text-sm"
+                className="px-4 py-2 hover:bg-[#3A3C40] cursor-pointer text-sm transition"
                 onClick={() => onClickRestrict(member.id)}
               >
                 Hạn chế tin nhắn
@@ -159,143 +141,149 @@ const RightSidebarGrChat: React.FC = () => {
             </div>
           )}
 
-          {/* phân quyền  */}
+          {/* phân quyền */}
           {rolePopupMemberId === member.id && (
-            <div className="absolute z-30 right-full top-0 w-48 bg-[#222] border border-gray-600 rounded p-3 shadow-lg">
-              <h3 className="text-white font-semibold mb-2">Chọn phân quyền</h3>
+            <div className="absolute z-30 right-full top-0 w-52 bg-[#252525] border border-gray-600 rounded-md p-4 shadow-xl font-roboto text-white text-sm">
+              <p className="mb-2 font-semibold border-b border-gray-700 pb-1">
+                Phân quyền thành viên
+              </p>
               {["GroupOwner", "Moderator", "Member", "SystemAdmin"].map(
                 (role) => (
-                  <div key={role} className="mb-1">
-                    <label className="inline-flex items-center cursor-pointer">
-                      <input
-                        type="radio"
-                        name={`role-${member.id}`}
-                        value={role}
-                        checked={selectedRole === role}
-                        onChange={() => setSelectedRole(role)}
-                        className="mr-2"
-                      />
-                      <span className="text-white">{role}</span>
-                    </label>
-                  </div>
+                  <label
+                    key={role}
+                    className="flex items-center gap-2 mb-2 cursor-pointer hover:text-yellow-400 transition"
+                  >
+                    <input
+                      type="radio"
+                      name="role"
+                      value={role}
+                      checked={selectedRole === role}
+                      onChange={() => setSelectedRole(role)}
+                      className="accent-yellow-400"
+                    />
+                    {role}
+                  </label>
                 )
               )}
-              <div className="mt-2 flex justify-end space-x-2">
-                <button
-                  onClick={() => {
-                    // TODO: Xử lý phân quyền tại đây
-                    console.log(`Phân quyền ${member.id} => ${selectedRole}`);
-                    setRolePopupMemberId(null);
-                  }}
-                  className="px-3 py-1 bg-green-600 rounded hover:bg-green-700 text-white"
-                >
-                  OK
-                </button>
-                <button
-                  onClick={() => setRolePopupMemberId(null)}
-                  className="px-3 py-1 bg-gray-500 rounded hover:bg-gray-600 text-white"
-                >
-                  Đóng
-                </button>
-              </div>
+              <button
+                className="mt-3 bg-yellow-500 text-black rounded px-3 py-1 hover:bg-yellow-600 transition"
+                onClick={() => {
+                  alert(
+                    `Đã cấp quyền ${selectedRole ?? "(chưa chọn)"} cho ${
+                      member.name
+                    }`
+                  );
+                  setRolePopupMemberId(null);
+                }}
+                disabled={!selectedRole}
+              >
+                Xác nhận
+              </button>
+              <button
+                className="ml-2 text-gray-400 hover:text-white"
+                onClick={() => setRolePopupMemberId(null)}
+              >
+                Hủy
+              </button>
             </div>
           )}
 
-          {/* hạn chế tin nhắn  */}
+          {/* hạn chế tin nhắn */}
           {restrictPopupMemberId === member.id && (
-            <div className="absolute z-30 right-full top-0 w-56 bg-[#222] border border-gray-600 rounded p-3 shadow-lg">
-              <h3 className="text-white font-semibold mb-2">
+            <div className="absolute z-30 right-full top-0 w-56 bg-[#252525] border border-gray-600 rounded-md p-4 shadow-xl font-roboto text-white text-sm">
+              <p className="mb-3 font-semibold border-b border-gray-700 pb-1">
                 Hạn chế tin nhắn
-              </h3>
-              <label className="inline-flex items-center mb-3 cursor-pointer">
+              </p>
+
+              <label className="flex items-center gap-2 mb-3 cursor-pointer hover:text-yellow-400 transition">
                 <input
                   type="checkbox"
                   checked={restrictAllChannels}
-                  onChange={() => setRestrictAllChannels((prev) => !prev)}
-                  className="mr-2"
+                  onChange={(e) => {
+                    setRestrictAllChannels(e.target.checked);
+                    if (e.target.checked) setRestrictedChannels([]);
+                  }}
+                  className="accent-yellow-400"
                 />
-                <span className="text-white">Hạn chế tất cả các kênh</span>
+                Hạn chế toàn bộ kênh
               </label>
+
               {!restrictAllChannels && (
-                <>
-                  <p className="text-white mb-1">Chọn kênh hạn chế:</p>
-                  <select
-                    className="w-full p-1 rounded bg-[#333] text-white"
-                    value={restrictedChannel}
-                    onChange={(e) => setRestrictedChannel(e.target.value)}
-                  >
-                    <option value="">-- Chọn kênh --</option>
-                    {channels.map((ch) => (
-                      <option key={ch} value={ch}>
-                        {ch}
-                      </option>
-                    ))}
-                  </select>
-                </>
+                <div className="max-h-28 overflow-y-auto border border-gray-700 rounded p-2">
+                  {channels.map((channel) => (
+                    <label
+                      key={channel}
+                      className="flex items-center gap-2 mb-1 cursor-pointer hover:text-yellow-400 transition text-xs"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={restrictedChannels.includes(channel)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setRestrictedChannels((prev) => [...prev, channel]);
+                          } else {
+                            setRestrictedChannels((prev) =>
+                              prev.filter((c) => c !== channel)
+                            );
+                          }
+                        }}
+                        className="accent-yellow-400"
+                      />
+                      #{channel}
+                    </label>
+                  ))}
+                </div>
               )}
-              <div className="mt-3 flex justify-end space-x-2">
+
+              <div className="mt-3 flex justify-end gap-2">
                 <button
+                  className="bg-yellow-500 text-black rounded px-3 py-1 hover:bg-yellow-600 transition disabled:opacity-50"
                   onClick={() => {
-                    // TODO: Gửi hạn chế lên server hoặc xử lý ở đây
-                    console.log(
-                      `Hạn chế ${member.id}:`,
-                      restrictAllChannels ? "Tất cả" : restrictedChannel
+                    alert(
+                      `Đã áp hạn chế ${
+                        restrictAllChannels
+                          ? "toàn bộ kênh"
+                          : restrictedChannels.join(", ")
+                      } cho ${member.name}`
                     );
                     setRestrictPopupMemberId(null);
                   }}
-                  className="px-3 py-1 bg-green-600 rounded hover:bg-green-700 text-white"
+                  disabled={
+                    !restrictAllChannels && restrictedChannels.length === 0
+                  }
                 >
-                  OK
+                  Xác nhận
                 </button>
                 <button
+                  className="text-gray-400 hover:text-white px-3 py-1"
                   onClick={() => setRestrictPopupMemberId(null)}
-                  className="px-3 py-1 bg-gray-500 rounded hover:bg-gray-600 text-white"
                 >
-                  Đóng
+                  Hủy
                 </button>
               </div>
             </div>
           )}
         </div>
       </div>
-
-      {hoveredMemberId === member.id && (
-        <div className="absolute left-0 top-full mt-2 w-full z-10 bg-[#1a1a1d] text-white p-2 rounded shadow-lg">
-          <h4 className="font-semibold text-sm mb-1">{member.name}</h4>
-          <p className="text-xs">Email: {member.email}</p>
-          <p className="text-xs">Phone: {member.phone}</p>
-        </div>
-      )}
     </div>
   );
-
-  const admins = members.filter((m) => m.isAdmin);
-  const regularMembers = members.filter((m) => !m.isAdmin);
 
   return (
     <div
-      className="bg-[#2B2D31] text-white p-4 custom-scrollbar"
-      style={{
-        width: "350px",
-        height: "calc(100vh - 60px)",
-        position: "fixed",
-        top: "60px",
-        right: 0,
-        overflowY: "scroll",
-        flexShrink: 0,
-      }}
+      className={twMerge(
+        "font-roboto fixed top-0 right-0 h-full w-[28rem] bg-[#181818] text-white shadow-lg overflow-auto p-6 transition-transform duration-300 ease-in-out"
+      )}
+      style={{ fontFamily: "'Roboto', sans-serif" }}
     >
-      <p className="text-xs font-semibold text-gray-400 mb-2">
-        ADMIN - {admins.length}
-      </p>
-      {admins.map(renderMemberItem)}
+      <h2 className="text-2xl font-semibold mb-6 tracking-wide border-b border-gray-700 pb-3">
+        Thành viên
+      </h2>
 
-      <p className="text-xs font-semibold text-gray-400 mb-2 mt-4">
-        MEMBER - {regularMembers.length}
-      </p>
-      {regularMembers.map(renderMemberItem)}
+      <div className="flex flex-col">
+        {members.map((member) => renderMemberItem(member))}
+      </div>
     </div>
   );
-};
+}
 
-export default RightSidebarGrChat;
+export default ConversationInfoExpanded;
