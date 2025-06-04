@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
+import { useGetGroupMembersQuery, useOverridePermissionMutation, useUpdateRoleUserMutation } from "../../../data/group/group.api";
+
 type ConversationInfoExpandedProps = {
   isShow: boolean;
   textChatType: "GroupChat" | "GroupCall";
@@ -41,11 +44,25 @@ export interface Member {
   isAdmin: boolean;
 }
 
+const ROLE_ID_MAP: Record<string, string> = {
+  Moderator: "52a327f4-0c05-4e0c-98c3-067f7f12aa33",
+  Member: "de299e19-f238-45c4-926a-2b440e720739",
+};
+
 function ConversationInfoExpanded({
   isShow,
   textChatType,
 }: ConversationInfoExpandedProps) {
-  const members = generateMembers();
+  const { groupId } = useParams();
+  const { data: membersData, isLoading } = useGetGroupMembersQuery({ groupId: groupId || "" }, { skip: !groupId });
+  const members: Member[] = (membersData?.result || []).map((m: any) => ({
+    id: m.user.id,
+    name: m.user.displayName,
+    avatar: m.user.avatarUrl,
+    email: m.user.email || "",
+    phone: m.user.phone || "",
+    isAdmin: m.roleId === "52a327f4-0c05-4e0c-98c3-067f7f12aa33", // hoặc roleId admin của bạn
+  }));
   const [hoveredMemberId, setHoveredMemberId] = useState<number | null>(null);
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
 
@@ -113,6 +130,9 @@ function ConversationInfoExpanded({
 
   const [isHoverRoleTrigger, setIsHoverRoleTrigger] = useState(false);
   const [isHoverRolePopup, setIsHoverRolePopup] = useState(false);
+
+  const [updateRoleUser] = useUpdateRoleUserMutation();
+  const [overridePermission] = useOverridePermissionMutation();
 
   const renderMemberItem = (member: Member) => (
     <div
@@ -190,12 +210,15 @@ function ConversationInfoExpanded({
               {["Moderator", "Member"].map((role) => (
                 <div
                   key={role}
-                  className="mb-1 cursor-pointer z-30   hover:text-purple-300 transition text-white"
+                  className="mb-1 cursor-pointer z-30 hover:text-purple-300 transition text-white"
                   onClick={() => {
-                    console.log(`Phân quyền ${member.id} => ${role}`);
                     setSelectedRole(role);
                     setRolePopupMemberId(null);
-                    // TODO: Thêm logic gọi API hoặc cập nhật backend
+                    // Call API
+                    if (groupId) {
+                      const roleId = ROLE_ID_MAP[role];
+                      updateRoleUser({ groupId, userId: String(member.id), roleId });
+                    }
                   }}
                 >
                   {role}
@@ -238,11 +261,16 @@ function ConversationInfoExpanded({
                     <input
                       type="checkbox"
                       className="form-checkbox h-4 w-4 bg-purple-600 mr-3"
-                      // TODO: Thêm xử lý checked + state nếu muốn lưu dữ liệu chọn
+                      checked={false}
+                      onChange={e => {
+                        // Call API only if unchecking (check == false)
+                        if (!e.target.checked && groupId) {
+                          overridePermission({ groupId, userId: String(member.id), permission: option, value: false });
+                        }
+                        // Update your state as needed
+                      }}
                     />
-                    <span className="hover:text-purple-300 transition">
-                      {option}
-                    </span>
+                    <span className="hover:text-purple-300 transition">{option}</span>
                   </label>
                 ))}
                 <div className="mt-4 flex justify-end space-x-2">

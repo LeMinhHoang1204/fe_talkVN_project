@@ -1,7 +1,5 @@
 import ChannelSidebar from "./pages/private/Home/ChannelSideBar";
-import RightSidebarGrChat from "./pages/private/Home/RightSidebarGrChat";
 import TopBarChannel from "./pages/private/Home/TopBarGrChat";
-import WelcomePage from "./pages/private/Home/WelcomePage";
 
 function AppLayout() {
   return (

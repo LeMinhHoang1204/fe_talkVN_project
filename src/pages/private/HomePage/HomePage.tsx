@@ -1,17 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { twMerge } from "tailwind-merge";
-import PostCard from "../../../components/PostCard";
-import UserSummarySuggestCard from "../../../components/UserSummarySuggestCard";
+// Update the import path below to the correct location of ChannelSidebar.tsx
 import { GlobalState } from "../../../data/global/global.slice";
 import { useGetPostsQuery } from "../../../data/post/post.api";
 import { GetListPostREQ } from "../../../data/post/post.request";
 import { useGetRecommendUsersQuery } from "../../../data/profile/profile.api";
-import { APP_ROUTE } from "../../../helpers/constants/route.constant";
 import { useAppSelector } from "../../../hooks/reduxHooks";
 import { useBreakpoint } from "../../../hooks/useBreakPoint";
 import { PostDTO } from "../../../types/data.type";
-import PostDetailModal from "../components/PostDetailModal";
+import ChannelSidebar from "../Home/ChannelSideBar";
 import WelcomePage from "../Home/WelcomePage";
 
 export const GET_POST_HOME_PAGE_SIZE = 3;
@@ -86,10 +83,14 @@ function HomePage() {
   });
 
   const navigate = useNavigate();
-
   return (
-    <div className="flex items-start">
-      <WelcomePage />
+    <div className="flex">
+      <div className="w-[18%] bg-[#2b2d31]">
+        <ChannelSidebar />
+      </div>
+      <div className="flex items-start flex-1">
+        <WelcomePage />
+      </div>
     </div>
   );
 }
