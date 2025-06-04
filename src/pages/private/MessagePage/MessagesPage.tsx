@@ -4,13 +4,13 @@ import {
   HubConnectionBuilder,
   LogLevel,
 } from "@microsoft/signalr";
+import axios from "axios";
 import { enqueueSnackbar } from "notistack";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import MessageItemInList, {
   MessageItemInListDTO,
 } from "../../../components/MessageItemInList";
-import UserNameDisplay from "../../../components/UserNameDisplay";
 import {
   GET_CONVERSATION_LIST_PAGE_SIZE,
   useCreateConversationByUsernameMutation,
@@ -18,6 +18,7 @@ import {
   useLazyGetConversationListByUsernameQuery,
 } from "../../../data/conversation/conversation.api";
 import { GlobalState } from "../../../data/global/global.slice";
+import { useCreateInvitationMutation } from "../../../data/group/group.api.ts"; // adjust path as needed
 import { socketBaseUrl } from "../../../helpers/constants/configs.constant";
 import { WEB_SOCKET_EVENT } from "../../../helpers/constants/websocket-event.constant";
 import { useAppSelector } from "../../../hooks/reduxHooks";
@@ -60,9 +61,8 @@ function MessagesPage({ ...props }: ConversationProps) {
 
   const [searchedUsers, setSearchedUsers] = useState<UserDTO[]>([]);
 
-  useEffect(() => {
-    console.log(messagesToRender);
-  }, [messagesToRender]);
+  const [inviteLink, setInviteLink] = useState("");
+  const [createInvitation, { isLoading: invitationLoading }] = useCreateInvitationMutation();
 
   const textChannels = (messagesToRender ?? []).filter(
     (item) => item.textChatType === "GroupChat"
@@ -166,6 +166,74 @@ function MessagesPage({ ...props }: ConversationProps) {
   
   const [showInviteModal, setShowInviteModal] = useState(false);
 
+  // Handler for clicking "Thêm thành viên"
+  const handleAddMemberClick = async () => {
+    if (!groupId) {
+      console.log("Không tìm thấy groupId.");
+      setInviteLink("Không tìm thấy groupId.");
+      return;
+    }
+    try {
+      const result = await createInvitation({ groupId }).unwrap();
+      setInviteLink(result.result.invitationUrl);
+      console.log(result.result.invitationUrl);
+      setShowInviteModal(true);
+    } catch (error) {
+      setInviteLink("Có lỗi xảy ra khi tạo link mời.");
+    }
+  };
+
+  const [search, setSearch] = useState("");
+  type SearchUser = { id: string; username: string };
+  const [users, setUsers] = useState<SearchUser[]>([]);
+  const [loading, setLoading] = useState(false);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Debounced search effect
+  useEffect(() => {
+    if (!search) {
+      setUsers([]);
+      return;
+    }
+    setLoading(true);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        console.log('dang goi api search');
+        const res = await axios.get("/api/Group/search-by-usernames", {
+          params: {
+            usernames: search,
+            PageIndex: 1,
+            PageSize: 10,
+          },
+        });
+        setUsers(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 500); // 500ms debounce
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [search]);
+
+  // Send invite handler
+  const handleInvite = async (targetUserId: string) => {
+    try {
+      console.log('dang goi api');
+      await axios.post("/api/Group/send-invite", {
+        groupId,
+        targetUserId,
+        senderUserId: userInfo.userId,
+      });
+      alert("Invite sent!");
+    } catch (err) {
+      alert("Failed to send invite");
+    }
+  };
+
   return (
     <div className="flex flex-row w-300px h-full bg-[#2B2D31]">
       <div className="flex flex-col md:w-[310px] h-full overflow-auto">
@@ -173,39 +241,29 @@ function MessagesPage({ ...props }: ConversationProps) {
           <span className="font-bold text-white flex justify-start items-center w-full pl-4 text-lg">
             {isGroupChat ? "Group Chat" : "Messages"}
           </span>
-          <span className="relative group/icon flex items-center pr-2 cursor-pointer"
-                onClick={() => setShowInviteModal(true)}
+          <button
+            onClick={handleAddMemberClick}
+            style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+            aria-label="Thêm thành viên"
           >
-              <svg
-                className=""
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 22 22"
-                fill="none"
-              >
-                <g clip-path="url(#clip0_153_103)">
-                  <path
-                    d="M14.6667 19.25V17.4167C14.6667 16.4442 14.2804 15.5116 13.5927 14.8239C12.9051 14.1363 11.9725 13.75 11 13.75H4.58335C3.61089 13.75 2.67826 14.1363 1.99063 14.8239C1.303 15.5116 0.916687 16.4442 0.916687 17.4167V19.25M18.3334 7.33333V12.8333M21.0834 10.0833H15.5834M11.4584 6.41667C11.4584 8.44171 9.81673 10.0833 7.79169 10.0833C5.76664 10.0833 4.12502 8.44171 4.12502 6.41667C4.12502 4.39162 5.76664 2.75 7.79169 2.75C9.81673 2.75 11.4584 4.39162 11.4584 6.41667Z"
-                    stroke="#DBDEE1"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </g>
-                <defs>
-                  <clipPath id="clip0_153_103">
-                    <rect width="20" height="20" fill="white" />
-                  </clipPath>
-                </defs>
-              </svg>
-              <div
-                className="absolute bottom-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 mb-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block"
-                style={{ fontSize: "11px" }}
-              >
-                Thêm thành viên
-              </div>
-            </span>
+            <svg
+              className=""
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 22 22"
+              fill="none"
+            >
+              <path
+                d="M17.2848 4.59186C18.984 6.29158 19.9386 8.5966 19.9386 11C19.9386 13.4034 18.984 15.7084 17.2848 17.4082M14.0852 7.7914C14.9348 8.64126 15.4121 9.79377 15.4121 10.9955C15.4121 12.1972 14.9348 13.3497 14.0852 14.1996M9.97025 4.65531L5.43832 8.28085H1.81277V13.7192H5.43832L9.97025 17.3447V4.65531Z"
+                stroke="#F5F5F5"
+                strokeOpacity="0.4"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
         </div>
 
         {showInviteModal && (
@@ -239,9 +297,10 @@ function MessagesPage({ ...props }: ConversationProps) {
             </div>
 
             {/* Header (Tiêu đề + kênh) */}
+            {/* Them thanh vien vao group */}
             <div className="px-6 py-2 border-b border-gray-700">
               <h2 className="text-white text-lg font-semibold">
-                Mời bạn bè vào Framework_^_^
+                Mời bạn bè vào nhóm
               </h2>
               <p className="text-gray-400 text-sm mt-1"># chào-mừng-và-nội-quy</p>
             </div>
@@ -254,27 +313,38 @@ function MessagesPage({ ...props }: ConversationProps) {
                 placeholder="Tìm kiếm bạn bè"
                 className="w-full px-4 py-2 bg-gray-700 text-white rounded-md placeholder-gray-400
                            focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
             </div>
 
             {/* Danh sách bạn bè (sẽ render động) */}
             <div id="friendsContainer" className="max-h-64 overflow-y-auto px-6 space-y-4">
               {/* Ta sẽ "mount" danh sách bạn bè vào đây bằng JS (xem phần script bên dưới) */}
-              <div id="loadingIndicator" className="text-gray-400 text-center py-4">
-                Đang tải danh sách bạn bè...
-              </div>
+              {loading && <div>Đang tải danh sách bạn bè...</div>}
+              {users.map(user => (
+                <div key={user.id} className="flex justify-between items-center py-2 border-b border-gray-600">
+                  <span>{user.username}</span>
+                  <button
+                    onClick={() => handleInvite(user.id)}
+                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Mời
+                  </button>
+                </div>
+              ))}
             </div>
 
             {/* Phần gửi link mời */}
             <div className="px-6 py-4 border-t border-gray-700">
               <label className="block text-gray-400 text-sm mb-2">
-                Hoặc, Gửi Link Mời Cho Họ
+                Gửi lời mời cho bạn bè
               </label>
               <div className="flex items-center space-x-2">
                 <input
                   id="inviteLinkInput"
                   type="text"
-                  value="https://discord.gg/dB55mAMR"
+                  value={inviteLink}
                   readOnly
                   className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-md focus:outline-none"
                 />
@@ -287,28 +357,25 @@ function MessagesPage({ ...props }: ConversationProps) {
               </div>
               <p className="text-gray-500 text-xs mt-2">
                 Link mới của bạn sẽ hết hạn sau 7 ngày.{" "}
-                <a href="#" className="text-blue-500 hover:underline">
-                  Chỉnh sửa link mới.
-                </a>
               </p>
             </div>
           </div>
         </div>
       )}
 
-        <div className="w-full h-auto">
-          <div className="flex flex-row justify-between px-2">
-            <div className="flex flex-col gap-2 px-2 py-2">
+        {/* <div className="w-full h-auto">
+          <div className="flex flex-row justify-between px-2"> */}
+            {/* <div className="flex flex-col gap-2 px-2 py-2">
               <div className="flex flex-row justify-between items-center">
                 <UserNameDisplay
                   id={userInfo.userId}
                   className="text-blue-400"
                   username={`@${userInfo.username}`}
                 />
-              </div>
+              </div> */}
 
               {/* Tim chat */}
-              <input
+              {/* <input
                 type="text"
                 list="usernames"
                 placeholder="Nhập @username để bắt đầu chat"
@@ -325,12 +392,12 @@ function MessagesPage({ ...props }: ConversationProps) {
                 <option value="admin" />
                 <option value="admin1" />
               </datalist>
-            </div>
-          </div>
-        </div>
+            </div> */}
+          {/* </div>
+        </div> */}
 
-        <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
-          <div className="font-bold px-4 pt-2">{autoCaplock("Channels")}</div>
+        <div className="flex flex-row pl-5 pr-2 py-2 overflow-y-auto text-[#80848E]">
+          <div className="w-full font-bold pL-4 py-2 border-b-[2px] border-[#80848E] justify-between items-center ">{autoCaplock("Channels")}</div>
         </div>
 
         {/* A message is a conversation */}
@@ -339,8 +406,13 @@ function MessagesPage({ ...props }: ConversationProps) {
           {error && <div>Error loading chats</div>}
 
           {/* Text Channel Section */}
-          <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
+          <div className="flex flex-row px-4 overflow-y-auto text-[#80848E] justify-between items-center">
             <div className="font-bold px-4 pt-2">{autoCaplock("Text channel")}</div>
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none">
+                <path d="M24 10V38M10 24H38" stroke="#B5BAC1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
           </div>
           {textChannels.length === 0 && (
             <div className="h-full flex flex-col justify-center items-center">
@@ -361,8 +433,13 @@ function MessagesPage({ ...props }: ConversationProps) {
           ))}
 
           {/* Video Channel Section */}
-          <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
+          <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E] justify-between items-center">
             <div className="font-bold px-4 pt-2">{autoCaplock("Video channel")}</div>
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none">
+                <path d="M24 10V38M10 24H38" stroke="#B5BAC1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
           </div>
           {videoChannels.length === 0 && (
             <div className="h-full flex flex-col justify-center items-center">
