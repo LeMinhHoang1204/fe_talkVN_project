@@ -6,8 +6,8 @@ import { UserDTO } from "../types/data.type";
 
 export type MessageItemInListDTO = {
   messageId: string;
-  latestMessage: string;
-  time: number;
+  // latestMessage: string;
+  // time: number;
   isRead: boolean;
   fromMe: boolean;
   // receiverId: string;
@@ -18,7 +18,7 @@ export type MessageItemInListDTO = {
   receivers: UserDTO[];
   textChatType: string;
   name: string;
-  id: string;
+  groupId: string;
 };
 
 export type ConversationListWithUserIds = {
@@ -114,12 +114,13 @@ function MessageItemInList({
           </svg>
 
           {/* {messageItemData.userDisplayName} */}
-          {messageItemData.receivers.map((userDisplayName, index) => (
+          {/* {messageItemData.receivers.map((userDisplayName, index) => (
             <span key={index}>
               {userDisplayName.userDisplayName}
               {index < messageItemData.receivers.length - 1 && ", "}
             </span>
-          ))}
+          ))} */}
+          {messageItemData.name}
 
           {/* Icon hover */}
           <span className="absolute right-0 flex items-center mr-4 gap-1 opacity-0 group-hover:opacity-100">

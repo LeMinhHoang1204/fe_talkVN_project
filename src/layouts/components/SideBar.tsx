@@ -18,7 +18,6 @@ import {
   EXPANDED_CONTENT_TYPE,
   SIDEBAR_TITLE,
 } from "../../types/side-bar.type";
-
 function SideBar() {
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
   const [activedIndex, setActivedIndex] = useState<number>(0);
@@ -156,11 +155,15 @@ function SideBar() {
     }
   };
 
+  const handleGoHome = () => {
+    navigate("/");
+  };
+
   return (
     <div className="bg-[#18092f] flex flex-col items-center justify-between h-full w-full py-4">
       {/* Top: Logo và Group Avatars */}
-      <div className="custom-scroll flex flex-col items-center space-y-6 overflow-y-auto overflow-x-hidden h-4/5 w-full">
-        <button className="group">
+      <div className="custom-scroll flex flex-col items-center space-y-6 overflow-visible  h-4/5 w-full">
+        <button className="group" onClick={handleGoHome}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="52"
@@ -191,14 +194,14 @@ function SideBar() {
           )}
           {!isLoading && !error && groups && groups.length > 0
             ? groups.map((group) => (
-                <div key={group.id} className="relative group/group">
+                <div key={group.id} className="relative group/group z-50">
                   <img
                     src={group.avatar || "/default-group-avatar.png"}
                     alt={group.name}
                     className="w-10 h-10 rounded-full border-2 border-white cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => handleGroupClick(group.id)}
                   />
-                  <div className="absolute right-full ml-2 px-2 py-1 bg-[#2C2C2C] text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover/group:opacity-100 transition-opacity absolute z-10">
+                  <div className="absolute left-full ml-2 top-1/2 -translate-y-[50%] px-2 py-1 bg-[#2C2C2C] text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover/group:opacity-100 transition-opacity">
                     {group.name}
                     {group.isPrivate && <span className="ml-1">🔒</span>}
                   </div>
