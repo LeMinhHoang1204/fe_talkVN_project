@@ -10,7 +10,6 @@ import { useParams } from "react-router-dom";
 import MessageItemInList, {
   MessageItemInListDTO,
 } from "../../../components/MessageItemInList";
-import UserNameDisplay from "../../../components/UserNameDisplay";
 import {
   GET_CONVERSATION_LIST_PAGE_SIZE,
   useCreateConversationByUsernameMutation,
@@ -173,6 +172,7 @@ function MessagesPage({ ...props }: ConversationProps) {
           <span className="font-bold text-white flex justify-start items-center w-full pl-4 text-lg">
             {isGroupChat ? "Group Chat" : "Messages"}
           </span>
+          {/* Popup invite friends */}
           <span className="relative group/icon flex items-center pr-2 cursor-pointer"
                 onClick={() => setShowInviteModal(true)}
           >
@@ -296,19 +296,19 @@ function MessagesPage({ ...props }: ConversationProps) {
         </div>
       )}
 
-        <div className="w-full h-auto">
-          <div className="flex flex-row justify-between px-2">
-            <div className="flex flex-col gap-2 px-2 py-2">
+        {/* <div className="w-full h-auto">
+          <div className="flex flex-row justify-between px-2"> */}
+            {/* <div className="flex flex-col gap-2 px-2 py-2">
               <div className="flex flex-row justify-between items-center">
                 <UserNameDisplay
                   id={userInfo.userId}
                   className="text-blue-400"
                   username={`@${userInfo.username}`}
                 />
-              </div>
+              </div> */}
 
               {/* Tim chat */}
-              <input
+              {/* <input
                 type="text"
                 list="usernames"
                 placeholder="Nhập @username để bắt đầu chat"
@@ -325,12 +325,12 @@ function MessagesPage({ ...props }: ConversationProps) {
                 <option value="admin" />
                 <option value="admin1" />
               </datalist>
-            </div>
-          </div>
-        </div>
+            </div> */}
+          {/* </div>
+        </div> */}
 
-        <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
-          <div className="font-bold px-4 pt-2">{autoCaplock("Channels")}</div>
+        <div className="flex flex-row pl-5 pr-2 py-2 overflow-y-auto text-[#80848E]">
+          <div className="w-full font-bold pL-4 py-2 border-b-[2px] border-[#80848E] justify-between items-center ">{autoCaplock("Channels")}</div>
         </div>
 
         {/* A message is a conversation */}
@@ -339,8 +339,13 @@ function MessagesPage({ ...props }: ConversationProps) {
           {error && <div>Error loading chats</div>}
 
           {/* Text Channel Section */}
-          <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
+          <div className="flex flex-row px-4 overflow-y-auto text-[#80848E] justify-between items-center">
             <div className="font-bold px-4 pt-2">{autoCaplock("Text channel")}</div>
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none">
+                <path d="M24 10V38M10 24H38" stroke="#B5BAC1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
           </div>
           {textChannels.length === 0 && (
             <div className="h-full flex flex-col justify-center items-center">
@@ -361,8 +366,13 @@ function MessagesPage({ ...props }: ConversationProps) {
           ))}
 
           {/* Video Channel Section */}
-          <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
+          <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E] justify-between items-center">
             <div className="font-bold px-4 pt-2">{autoCaplock("Video channel")}</div>
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" fill="none">
+                <path d="M24 10V38M10 24H38" stroke="#B5BAC1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
           </div>
           {videoChannels.length === 0 && (
             <div className="h-full flex flex-col justify-center items-center">

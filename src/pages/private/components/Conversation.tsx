@@ -337,7 +337,7 @@ function Conversation({
           }
         />
       </div>
-      <ConversationInfoExpanded isShow={isShowConversationInfoExpanded} />
+      <ConversationInfoExpanded isShow={isShowConversationInfoExpanded} textChatType={"GroupChat"} />
     </div>
   );
 }
