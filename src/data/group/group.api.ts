@@ -64,6 +64,23 @@ const groupApi = usersApi.injectEndpoints({
         params: { groupId },
       }),
     }),
+
+    searchGroupByUsernames: build.query<any[], { usernames: string; PageIndex?: number; PageSize?: number }>({
+      query: ({ usernames, PageIndex = 1, PageSize = 10 }) => ({
+        url: `/Group/search-by-usernames`,
+        method: 'GET',
+        params: { usernames, PageIndex, PageSize },
+      }),
+      transformResponse: (response: BaseResponse<any[]>) => response.result || [],
+    }),
+
+    sendInvite: build.mutation<any, { groupId: string; targetUserId: string; senderUserId: string }>({
+      query: (body) => ({
+        url: '/Group/send-invite',
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
@@ -75,4 +92,7 @@ export const {
   useGetGroupByInvitationCodeQuery,
   useGetGroupChannelsQuery,
   useCreateInvitationMutation,
+  useSearchGroupByUsernamesQuery,
+  useLazySearchGroupByUsernamesQuery,
+  useSendInviteMutation,
 } = groupApi;
