@@ -12,6 +12,7 @@ import MessagesPage from "../pages/private/MessagePage/MessagesPage";
 import ProfilePage from "../pages/private/ProfilePage/ProfilePage";
 import VideoCall from "../pages/private/VideoCall/VideoCall";
 import GoogleCallbackPage from "../pages/public/GoogleCallbackPage";
+import InvitationPage from "../pages/public/InvitationPage";
 import LoginPage from "../pages/public/LoginPage";
 import SignUpPage from "../pages/public/SignUpPage";
 
@@ -34,11 +35,14 @@ export const router = createBrowserRouter([
           },
           {
             path: APP_ROUTE.MAIN.MESSAGES,
-            element: <MessagesPage />,
-          },
-          {
-            path: "/group/:groupId",
-            element: <MessagesPage />,
+            element: (
+              <MessagesPage
+                conversationId={""}
+                chatter={[]}
+                lastChatterActiveTime={0}
+                connection={null}
+              />
+            ),
           },
           {
             path: APP_ROUTE.MAIN.PROFILE(":id"),
@@ -51,6 +55,14 @@ export const router = createBrowserRouter([
           {
             path: "/group-chat",
             element: <AppLayout />,
+          },
+          {
+            path: "/invitation/:invitationCode",
+            element: <InvitationPage />,
+          },
+          {
+            path: "/group/:groupId",
+            element: <MessagesPage />,
           },
         ],
       },

@@ -36,6 +36,11 @@ export type UserDTO = {
   username: string;
   userDisplayName: string;
   profileImage: ImageDTO;
+  email?: string;
+  phoneNumber?: string;
+  lastName?: string;
+  firstName?: string;
+  role?: string;
 };
 
 export type MessageDTO = {
@@ -80,6 +85,11 @@ export type ProfileDetailDTO = {
   profileImage: ImageDTO;
   bio: string;
   isFollowed: boolean;
+  email?: string;
+  phoneNumber?: string;
+  lastName?: string;
+  firstName?: string;
+  role?: string;
 };
 
 export enum NOTIFICATION_TYPE {
@@ -102,9 +112,15 @@ export type ConversationInformationDTO = {
   chatter: UserDTO[];
 };
 
-export type GroupDTO = {
-  userId: string;
-  user: {
+export interface GroupDTO {
+  id: string;
+  name: string;
+  isPrivate: boolean;
+  url: string;
+  description: string;
+  status: number;
+  maxQuantity: number;
+  creator: {
     id: string;
     displayName: string;
     avatarUrl: string;
@@ -113,4 +129,4 @@ export type GroupDTO = {
   roleId: string;
   acceptedBy: string;
   invitedBy: string;
-};
+}

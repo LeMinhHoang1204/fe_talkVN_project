@@ -18,7 +18,6 @@ import {
   EXPANDED_CONTENT_TYPE,
   SIDEBAR_TITLE,
 } from "../../types/side-bar.type";
-
 function SideBar() {
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
   const [activedIndex, setActivedIndex] = useState<number>(0);
@@ -46,17 +45,6 @@ function SideBar() {
   const userName = userInfo ? userInfo.username : "User";
   const userAvatar = userInfo ? userInfo.avatarUrl : "/default-avatar.png";
   const navigate = useNavigate();
-
-  // Track when groupsData changes
-  useEffect(() => {
-    console.log("Groups data changed:", {
-      isLoading,
-      isError: !!error,
-      hasData: !!groups?.length,
-      resultLength: groups?.length,
-      rawData: groups,
-    });
-  }, [groups, isLoading, error]);
 
   const handleSideBarItemSelect = useCallback(
     (index: number, title: SIDEBAR_TITLE) => {
@@ -128,7 +116,7 @@ function SideBar() {
 
   const handleGroupClick = useCallback(
     (groupId: string) => {
-      navigate(`/group/${groupId}`);
+      navigate(`/Group/${groupId}`);
     },
     [navigate]
   );
@@ -144,8 +132,6 @@ function SideBar() {
         setCreateError("Mật khẩu không được để trống với nhóm riêng tư");
         return;
       }
-
-      console.log("newGroup", newGroup);
 
       const response = await createGroup({
         ...newGroup,
@@ -169,11 +155,15 @@ function SideBar() {
     }
   };
 
+  const handleGoHome = () => {
+    navigate("/");
+  };
+
   return (
-    <div className="bg-[#18092f] flex flex-col items-center justify-between h-screen py-4">
+    <div className="bg-[#18092f] flex flex-col items-center justify-between h-full w-full py-4">
       {/* Top: Logo và Group Avatars */}
-      <div className="flex flex-col items-center space-y-6">
-        <button className="group">
+      <div className="custom-scroll flex flex-col items-center space-y-6 overflow-visible  h-4/5 w-full">
+        <button className="group" onClick={handleGoHome}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="52"
@@ -204,14 +194,14 @@ function SideBar() {
           )}
           {!isLoading && !error && groups && groups.length > 0
             ? groups.map((group) => (
-                <div key={group.id} className="relative group/group">
+                <div key={group.id} className="relative group/group z-50">
                   <img
                     src={group.avatar || "/default-group-avatar.png"}
                     alt={group.name}
                     className="w-10 h-10 rounded-full border-2 border-white cursor-pointer hover:opacity-80 transition-opacity"
                     onClick={() => handleGroupClick(group.id)}
                   />
-                  <div className="absolute left-full ml-2 px-2 py-1 bg-[#2C2C2C] text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover/group:opacity-100 transition-opacity">
+                  <div className="absolute left-full ml-2 top-1/2 -translate-y-[50%] px-2 py-1 bg-[#2C2C2C] text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover/group:opacity-100 transition-opacity">
                     {group.name}
                     {group.isPrivate && <span className="ml-1">🔒</span>}
                   </div>
@@ -223,19 +213,18 @@ function SideBar() {
         </div>
 
         {/* Create group button with tooltip */}
-        <div className="relative group/icon">
-          <button
-            className="w-12 h-12 bg-[#2E1A47] text-white rounded-full hover:rounded-2xl flex items-center justify-center transition-all duration-200"
-            onClick={() => setShowCreateGroupModal(true)}
-          >
-            <Plus size={24} />
-          </button>
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block">
-            Create Group
-          </div>
+      </div>
+      <div className="relative group/icon">
+        <button
+          className="w-12 h-12 bg-[#2E1A47] text-white rounded-full hover:rounded-2xl flex items-center justify-center transition-all duration-200"
+          onClick={() => setShowCreateGroupModal(true)}
+        >
+          <Plus size={24} />
+        </button>
+        <div className="absolute top-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block">
+          Create Group
         </div>
       </div>
-
       {/* User avatar and logout dropdown */}
       <div className="relative">
         <img

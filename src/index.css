@@ -37,3 +37,23 @@ html {
   scrollbar-width: thin;
   scrollbar-color: #555 transparent;
 }
+.custom-scroll {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgb(24, 9, 47) #2e1a47; /* thumb & track (Firefox) */
+}
+
+/* Chrome, Edge, and Safari */
+.custom-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #2e1a47;
+  border-radius: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: rgb(24, 9, 47);
+  border-radius: 10px;
+  border: 1px solid transparent;
+}

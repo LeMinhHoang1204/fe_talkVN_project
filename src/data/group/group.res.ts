@@ -1,130 +1,153 @@
 export interface CreateGroupRequest {
-    name: string;
-    description: string;
-    isPrivate: boolean;
-    maxQuantity: number;
-    password?: string;
+  name: string;
+  description: string;
+  isPrivate: boolean;
+  maxQuantity: number;
+  password?: string;
 }
 
 export interface GroupData {
     id: string;
     name: string;
     isPrivate: boolean;
-    avatar?: string;
-    url?: string;
-    description?: string;
+    avatar: string;
+    url: string;
+    description: string;
+    status: number;
     maxQuantity: number;
     creator: {
         id: string;
+        displayName: string;
+        avatarUrl: string;
     };
-    displayName?: string;
-    avatarUrl?: string;
     createdOn: string;
     updatedOn: string;
 }
 
 export interface getAllGroupResponse {
-    succeeded: boolean;
-    result: GroupData[];
-    errors?: Array<{
-        code: string;
-        message: string;
-    }>;
+  succeeded: boolean;
+  result: GroupData[];
+  errors?: Array<{
+    code: string;
+    message: string;
+  }>;
 }
 
 export interface BaseResponse<T> {
-    succeeded: boolean;
-    result: T;
-    errors?: Array<{
-        code: string;
-        message: string;
-    }>;
+  succeeded: boolean;
+  result: T;
+  errors?: Array<{
+    code: string;
+    message: string;
+  }>;
 }
 
 export type createGroupResponse = {
-    succeeded: boolean;
-    result: {
-        id: string;
-        name: string;
-        isPrivate: boolean;
-        avatar: string;
-        url: string;
-        description: string;
-        status: number;
-        maxQuantity: number;
-        creator: {
-            id: string;
-            displayName: string;
-            avatarUrl: string;
-        };
-        createdOn: string;
-        updatedOn: string;
+  succeeded: boolean;
+  result: {
+    id: string;
+    name: string;
+    isPrivate: boolean;
+    avatar: string;
+    url: string;
+    description: string;
+    status: number;
+    maxQuantity: number;
+    creator: {
+      id: string;
+      displayName: string;
+      avatarUrl: string;
     };
-    errors: Array<{
-        code: string;
-        message: string;
-    }>;
+    createdOn: string;
+    updatedOn: string;
+  };
+  errors: Array<{
+    code: string;
+    message: string;
+  }>;
+};
+
+export interface GroupChannels {
+  id: string;
+  name: string;
+  textChatType: 'GroupChat' | 'GroupCall';
+  groupId: string;
+  lastMessage: any | null;
+  createdBy: any | null;
+  userReceivers: Array<{
+    id: string;
+    displayName: string;
+    avatarUrl: string;
+  }>;
+}
+
+export type getGroupChannelsResponse = {
+  succeeded: boolean;
+  result: GroupChannels[];
+  errors: Array<{
+    code: string;
+    message: string;
+  }>;
 };
 
 export type getGroupMembersResponse = {
-    succeeded: boolean;
-    result: Array<{
-        userId: string;
-        user: {
-            id: string;
-            displayName: string;
-            avatarUrl: string;
-        };
-        groupId: string;
-        roleId: string;
-        acceptedBy: string;
-        invitedBy: string;
-    }>;
-    errors: Array<{
-        code: string;
-        message: string;
-    }>
+  succeeded: boolean;
+  result: Array<{
+    userId: string;
+    user: {
+      id: string;
+      displayName: string;
+      avatarUrl: string;
+    };
+    groupId: string;
+    roleId: string;
+    acceptedBy: string;
+    invitedBy: string;
+  }>;
+  errors: Array<{
+    code: string;
+    message: string;
+  }>;
 };
 
 export type createGroupInvitationResponse = {
-    succeeded: boolean;
-    result: {
-        id: string;
-        invitationCode: string;
-        invitationUrl: string;
-        expirationDate: string;
-        createdDate: string;
-        groupId: string;
-        inviterId: string;
-    };
-    errors: Array<{
-        code: string;
-        message: string;
-    }>;
+  succeeded: boolean;
+  result: {
+    id: string;
+    invitationCode: string;
+    invitationUrl: string;
+    expirationDate: string;
+    createdDate: string;
+    groupId: string;
+    inviterId: string;
+  };
+  errors: Array<{
+    code: string;
+    message: string;
+  }>;
 };
 
 export type getGroupByInvitationCodeResponse = {
-    succeeded: boolean;
-    result: {
-        id: string;
-        name: string;
-        isPrivate: boolean;
-        avatar: string;
-        url: string;
-        description: string;
-        status: number;
-        maxQuantity: number;
-        creator: {
-            id: string;
-            displayName: string;
-            avatarUrl: string;
-        };
-        createdOn: string;
-        updatedOn: string;
+  succeeded: boolean;
+  result: {
+    id: string;
+    name: string;
+    isPrivate: boolean;
+    avatar: string;
+    url: string;
+    description: string;
+    status: number;
+    maxQuantity: number;
+    creator: {
+      id: string;
+      displayName: string;
+      avatarUrl: string;
     };
-    errors: Array<{
-        code: string;
-        message: string;
-    }>;
+    createdOn: string;
+    updatedOn: string;
+  };
+  errors: Array<{
+    code: string;
+    message: string;
+  }>;
 };
-
