@@ -7,21 +7,21 @@ export interface CreateGroupRequest {
 }
 
 export interface GroupData {
+  id: string;
+  name: string;
+  isPrivate: boolean;
+  avatar: string;
+  url: string;
+  description: string;
+  status: number;
+  maxQuantity: number;
+  creator: {
     id: string;
-    name: string;
-    isPrivate: boolean;
-    avatar: string;
-    url: string;
-    description: string;
-    status: number;
-    maxQuantity: number;
-    creator: {
-        id: string;
-        displayName: string;
-        avatarUrl: string;
-    };
-    createdOn: string;
-    updatedOn: string;
+    displayName: string;
+    avatarUrl: string;
+  };
+  createdOn: string;
+  updatedOn: string;
 }
 
 export interface getAllGroupResponse {
@@ -70,7 +70,7 @@ export type createGroupResponse = {
 export interface GroupChannels {
   id: string;
   name: string;
-  textChatType: 'GroupChat' | 'GroupCall';
+  textChatType: "GroupChat" | "GroupCall";
   groupId: string;
   lastMessage: any | null;
   createdBy: any | null;
@@ -147,6 +147,49 @@ export type getGroupByInvitationCodeResponse = {
     updatedOn: string;
   };
   errors: Array<{
+    code: string;
+    message: string;
+  }>;
+};
+
+export type JoinGroupRequestDto = {
+  id: string;
+  groupId: string;
+  invitationCode: string;
+  user: {
+    id: string;
+    displayName: string;
+    avatarUrl: string;
+  };
+  groupInvitation: {
+    id: string;
+    invitationCode: string;
+    invitationUrl: string;
+    expirationDate: string;
+    createdDate: string;
+    groupId: string;
+    inviterId: string;
+    inviter: {
+      id: string;
+      displayName: string;
+      avatarUrl: string;
+    };
+  };
+};
+
+export type ApproveJoinGroupRequestResponse = {
+  succeeded: boolean;
+  result: string; // Assuming this is the ID of the approved join request
+  errors?: Array<{
+    code: string;
+    message: string;
+  }>;
+};
+
+export type getJoinGroupRequestsResponse = {
+  succeeded: boolean;
+  result: JoinGroupRequestDto[];
+  errors?: Array<{
     code: string;
     message: string;
   }>;

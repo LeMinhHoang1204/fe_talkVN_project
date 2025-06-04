@@ -2,11 +2,22 @@ import { HTTP_METHOD } from "../../helpers/constants/common.constant";
 import { BaseResponse } from "../../types/data.type";
 import { usersApi } from "../usersApi.api";
 import { GetGroupRequest } from "./group.req";
-import { CreateGroupRequest, GroupData, createGroupResponse, getAllGroupResponse, getGroupByInvitationCodeResponse, getGroupChannelsResponse } from "./group.res";
+import {
+  CreateGroupRequest,
+  GroupData,
+  createGroupResponse,
+  getAllGroupResponse,
+  getGroupByInvitationCodeResponse,
+  getGroupChannelsResponse,
+  getJoinGroupRequestsResponse,
+} from "./group.res";
 
 const groupApi = usersApi.injectEndpoints({
   endpoints: (build) => ({
-    getAllGroups: build.query<getAllGroupResponse, { pageIndex?: number; pageSize?: number }>({
+    getAllGroups: build.query<
+      getAllGroupResponse,
+      { pageIndex?: number; pageSize?: number }
+    >({
       query: (params) => ({
         url: `/Group`,
         method: HTTP_METHOD.GET,
@@ -15,10 +26,28 @@ const groupApi = usersApi.injectEndpoints({
           PageSize: params.pageSize || 12,
         },
       }),
-      transformResponse: (response: BaseResponse<getAllGroupResponse>) => response.result,
+      transformResponse: (response: BaseResponse<getAllGroupResponse>) =>
+        response.result,
     }),
-    
-    getUserJoinedGroups: build.query<GroupData[], { pageIndex?: number; pageSize?: number }>({
+
+    getJoinGroupRequests: build.query<
+      getJoinGroupRequestsResponse,
+      GetGroupRequest
+    >({
+      query: ({ groupId }) => ({
+        url: `/Group/get-join-group-requests`,
+        method: HTTP_METHOD.GET,
+        params: { groupId },
+      }),
+      transformResponse: (
+        response: BaseResponse<getJoinGroupRequestsResponse>
+      ) => response.result,
+    }),
+
+    getUserJoinedGroups: build.query<
+      GroupData[],
+      { pageIndex?: number; pageSize?: number }
+    >({
       query: (params) => ({
         url: `/Group/get-joined-groups`,
         method: HTTP_METHOD.GET,
@@ -35,13 +64,16 @@ const groupApi = usersApi.injectEndpoints({
 
     createGroup: build.mutation<createGroupResponse, CreateGroupRequest>({
       query: (body) => ({
-        url: '/Group',
+        url: "/Group",
         method: HTTP_METHOD.POST,
         body,
       }),
     }),
 
-    getGroupByInvitationCode: build.query<getGroupByInvitationCodeResponse, { invitationCode: string }>({
+    getGroupByInvitationCode: build.query<
+      getGroupByInvitationCodeResponse,
+      { invitationCode: string }
+    >({
       query: ({ invitationCode }) => ({
         url: `/Group/get-by-invitation-code`,
         method: HTTP_METHOD.GET,
@@ -51,10 +83,35 @@ const groupApi = usersApi.injectEndpoints({
 
     getGroupChannels: build.query<getGroupChannelsResponse, GetGroupRequest>({
       query: ({ groupId }) => ({
-      url: `/Group/${groupId}`,
-      method: HTTP_METHOD.GET,
+        url: `/Group/${groupId}`,
+        method: HTTP_METHOD.GET,
       }),
-      transformResponse: (response: BaseResponse<getGroupChannelsResponse>) => response.result,
+      transformResponse: (response: BaseResponse<getGroupChannelsResponse>) =>
+        response.result,
+    }),
+
+    approveJoinGroupRequest: build.mutation<
+      string,
+      { joinGroupRequestId: string }
+    >({
+      query: (body) => ({
+        url: `/Group/approve-join-request`,
+        method: HTTP_METHOD.PUT,
+        body,
+      }),
+      transformResponse: (response: BaseResponse<string>) => response.result,
+    }),
+
+    rejectJoinGroupRequest: build.mutation<
+      string,
+      { joinGroupRequestId: string }
+    >({
+      query: (body) => ({
+        url: `/Group/reject-join-request`,
+        method: HTTP_METHOD.PUT,
+        body,
+      }),
+      transformResponse: (response: BaseResponse<string>) => response.result,
     }),
   }),
 });
@@ -66,4 +123,7 @@ export const {
   useCreateGroupMutation,
   useGetGroupByInvitationCodeQuery,
   useGetGroupChannelsQuery,
+  useGetJoinGroupRequestsQuery,
+  useApproveJoinGroupRequestMutation,
+  useRejectJoinGroupRequestMutation,
 } = groupApi;

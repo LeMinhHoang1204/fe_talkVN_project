@@ -18,6 +18,11 @@ import {
   useLazyGetConversationListByUsernameQuery,
 } from "../../../data/conversation/conversation.api";
 import { GlobalState } from "../../../data/global/global.slice";
+import {
+  useApproveJoinGroupRequestMutation,
+  useGetJoinGroupRequestsQuery,
+  useRejectJoinGroupRequestMutation,
+} from "../../../data/group/group.api.ts";
 import { socketBaseUrl } from "../../../helpers/constants/configs.constant";
 import { WEB_SOCKET_EVENT } from "../../../helpers/constants/websocket-event.constant";
 import { useAppSelector } from "../../../hooks/reduxHooks";
@@ -36,29 +41,66 @@ function MessagesPage({ ...props }: ConversationProps) {
   const { groupId } = useParams();
   const isGroupChat = !!groupId;
 
-  const { data: messageListData, refetch, isLoading, error } = useGetConversationListQuery({
+  const {
+    data: messageListData,
+    refetch,
+    isLoading,
+    error,
+  } = useGetConversationListQuery({
     PageIndex: 1,
     PageSize: GET_CONVERSATION_LIST_PAGE_SIZE,
-    groupId: isGroupChat ? groupId : undefined, // Truyền groupId
+    groupId: isGroupChat ? groupId : undefined,
     endpoint: isGroupChat ? `/Group/${groupId}` : undefined,
   });
 
   const [chatter, setChatter] = useState<UserDTO[]>();
-
   const [selectedMessageId, setSelectedMessageId] = useState<string>(
     messageListData?.data?.[0]?.messageId || ""
   );
   const [connection, setConnection] = useState<HubConnection | null>(null);
-
   const [createConversation] = useCreateConversationByUsernameMutation();
-
   const [refetchConversationList] = useLazyGetConversationListByUsernameQuery();
   const [searchResult, setSearchResult] = useState<
     MessageItemInListDTO[] | null
   >(null);
   const messagesToRender = searchResult ?? messageListData?.data ?? [];
-
   const [searchedUsers, setSearchedUsers] = useState<UserDTO[]>([]);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showJoinRequestModal, setShowJoinRequestModal] = useState(false);
+  const [pendingRequests, setPendingRequests] = useState<
+    { id: string; avatar: string; username: string; invitedBy: string }[]
+  >([]);
+  const [approveJoinGroupRequest, { isLoading: isApproving }] =
+    useApproveJoinGroupRequestMutation();
+  const [rejectJoinGroupRequest, { isLoading: isRejecting }] =
+    useRejectJoinGroupRequestMutation();
+
+  useGetJoinGroupRequestsQuery(
+    { groupId: groupId || "" },
+    { skip: !showJoinRequestModal || !groupId }
+  );
+
+  const { data: joinRequests, isLoading: isLoadingJoinRequests } =
+    useGetJoinGroupRequestsQuery(
+      { groupId: groupId || "" },
+      { skip: !showJoinRequestModal || !groupId }
+    );
+
+  useEffect(() => {
+    console.log("joinRequests", joinRequests);
+    if (Array.isArray(joinRequests)) {
+      setPendingRequests(
+        joinRequests.map((request) => ({
+          id: request.id,
+          avatar: request.user.avatarUrl,
+          username: request.user.displayName,
+          invitedBy: request.groupInvitation.inviter.displayName,
+        }))
+      );
+    } else {
+      setPendingRequests([]);
+    }
+  }, [joinRequests]);
 
   useEffect(() => {
     console.log(messagesToRender);
@@ -67,7 +109,6 @@ function MessagesPage({ ...props }: ConversationProps) {
   const textChannels = (messagesToRender ?? []).filter(
     (item) => item.textChatType === "GroupChat"
   );
-
   const videoChannels = (messagesToRender ?? []).filter(
     (item) => item.textChatType === "GroupCall"
   );
@@ -75,6 +116,7 @@ function MessagesPage({ ...props }: ConversationProps) {
   function autoCaplock(str: string): string {
     return str.toUpperCase();
   }
+
   useEffect(() => {
     const setupSignalR = async () => {
       const newConnection = new HubConnectionBuilder()
@@ -161,10 +203,33 @@ function MessagesPage({ ...props }: ConversationProps) {
     }
   };
 
-  const groupCalls = (messageListData?.data ?? []).filter(chat => chat.textChatType === "GroupCall");
-  const groupChats = (messageListData?.data ?? []).filter(chat => chat.textChatType === "GroupChat");
-  
-  const [showInviteModal, setShowInviteModal] = useState(false);
+  // Thêm hàm xử lý approve
+  const handleApprove = async (requestId: string) => {
+    try {
+      await approveJoinGroupRequest({ joinGroupRequestId: requestId }).unwrap();
+      enqueueSnackbar("Duyệt yêu cầu thành công!", { variant: "success" });
+      setPendingRequests((prev) => prev.filter((req) => req.id !== requestId));
+    } catch (error) {
+      enqueueSnackbar("Duyệt yêu cầu thất bại!", { variant: "error" });
+    }
+  };
+
+  const handleReject = async (requestId: string) => {
+    try {
+      await rejectJoinGroupRequest({ joinGroupRequestId: requestId }).unwrap();
+      enqueueSnackbar("Từ chối yêu cầu thành công!", { variant: "success" });
+      setPendingRequests((prev) => prev.filter((req) => req.id !== requestId));
+    } catch (error) {
+      enqueueSnackbar("Từ chối yêu cầu thất bại!", { variant: "error" });
+    }
+  };
+
+  useEffect(() => {
+    console.log("showJoinRequestModal changed:", showJoinRequestModal);
+    if (!showJoinRequestModal) {
+      setPendingRequests([]);
+    }
+  }, [showJoinRequestModal]);
 
   return (
     <div className="flex flex-row w-300px h-full bg-[#2B2D31]">
@@ -173,9 +238,11 @@ function MessagesPage({ ...props }: ConversationProps) {
           <span className="font-bold text-white flex justify-start items-center w-full pl-4 text-lg">
             {isGroupChat ? "Group Chat" : "Messages"}
           </span>
-          <span className="relative group/icon flex items-center pr-2 cursor-pointer"
-                onClick={() => setShowInviteModal(true)}
-          >
+          <div className="flex space-x-2">
+            <span
+              className="relative group/icon flex items-center pr-2 cursor-pointer"
+              onClick={() => setShowInviteModal(true)}
+            >
               <svg
                 className=""
                 xmlns="http://www.w3.org/2000/svg"
@@ -206,95 +273,194 @@ function MessagesPage({ ...props }: ConversationProps) {
                 Thêm thành viên
               </div>
             </span>
+            <span
+              className="relative group/icon flex items-center pr-2 cursor-pointer"
+              onClick={() => setShowJoinRequestModal(true)}
+            >
+              <svg
+                className=""
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <path
+                  d="M12 4.5V19.5M19.5 12H4.5"
+                  stroke="#DBDEE1"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+              <div
+                className="absolute bottom-full left-1/2 -translate-x-1/2 border border-[#B5BAC1] mt-1 mb-1 px-2 py-1 bg-[#2C2C2C] text-[#F5F5F5] text-xs rounded shadow-lg whitespace-nowrap z-10 hidden group-hover/icon:block"
+                style={{ fontSize: "11px" }}
+              >
+                Join Request
+              </div>
+            </span>
+          </div>
         </div>
 
         {showInviteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          {/* Container chính của pop-up */}
-          <div className="bg-gray-800 rounded-lg w-full max-w-md mx-4 shadow-lg">
-
-            {/* Dòng ngang chứa nút đóng ở góc phải */}
-            <div className="flex justify-end p-2">
-              <button
-                onClick={() => setShowInviteModal(false)}
-                className="text-gray-400 hover:text-white"
-                aria-label="Đóng"
-              >
-                {/* Bạn có thể thay bằng icon "X" SVG nếu muốn */}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            {/* Header (Tiêu đề + kênh) */}
-            <div className="px-6 py-2 border-b border-gray-700">
-              <h2 className="text-white text-lg font-semibold">
-                Mời bạn bè vào Framework_^_^
-              </h2>
-              <p className="text-gray-400 text-sm mt-1"># chào-mừng-và-nội-quy</p>
-            </div>
-
-            {/* Input tìm kiếm bạn bè */}
-            <div className="px-6 py-4">
-              <input
-                id="searchInput"
-                type="text"
-                placeholder="Tìm kiếm bạn bè"
-                className="w-full px-4 py-2 bg-gray-700 text-white rounded-md placeholder-gray-400
-                           focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Danh sách bạn bè (sẽ render động) */}
-            <div id="friendsContainer" className="max-h-64 overflow-y-auto px-6 space-y-4">
-              {/* Ta sẽ "mount" danh sách bạn bè vào đây bằng JS (xem phần script bên dưới) */}
-              <div id="loadingIndicator" className="text-gray-400 text-center py-4">
-                Đang tải danh sách bạn bè...
-              </div>
-            </div>
-
-            {/* Phần gửi link mời */}
-            <div className="px-6 py-4 border-t border-gray-700">
-              <label className="block text-gray-400 text-sm mb-2">
-                Hoặc, Gửi Link Mời Cho Họ
-              </label>
-              <div className="flex items-center space-x-2">
-                <input
-                  id="inviteLinkInput"
-                  type="text"
-                  value="https://discord.gg/dB55mAMR"
-                  readOnly
-                  className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-md focus:outline-none"
-                />
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-gray-800 rounded-lg w-full max-w-md mx-4 shadow-lg">
+              <div className="flex justify-end p Tick all that apply:2">
                 <button
-                  id="copyInviteBtn"
-                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                  onClick={() => setShowInviteModal(false)}
+                  className="text-gray-400 hover:text-white"
                 >
-                  Sao chép
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
                 </button>
               </div>
-              <p className="text-gray-500 text-xs mt-2">
-                Link mới của bạn sẽ hết hạn sau 7 ngày.{" "}
-                <a href="#" className="text-blue-500 hover:underline">
-                  Chỉnh sửa link mới.
-                </a>
-              </p>
+              <div className="px-6 py-2 border-b border-gray-700">
+                <h2 className="text-white text-lg font-semibold">
+                  Mời bạn bè vào Framework_^_^
+                </h2>
+                <p className="text-gray-400 text-sm mt-1">
+                  # chào-mừng-và-nội-quy
+                </p>
+              </div>
+              <div className="px-6 py-4">
+                <input
+                  id="searchInput"
+                  type="text"
+                  placeholder="Tìm kiếm bạn bè"
+                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-md placeholder-gray-400
+                           focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div
+                id="friendsContainer"
+                className="max-h-64 overflow-y-auto px-6 space-y-4"
+              >
+                <div
+                  id="loadingIndicator"
+                  className="text-gray-400 text-center py-4"
+                >
+                  Đang tải danh sách bạn bè...
+                </div>
+              </div>
+              <div className="px-6 py-4 border-t border-gray-700">
+                <label className="block text-gray-400 text-sm mb-2">
+                  Hoặc, Gửi Link Mời Cho Họ
+                </label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    id="inviteLinkInput"
+                    type="text"
+                    value="https://discord.gg/dB55mAMR"
+                    readOnly
+                    className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-md focus:outline-none"
+                  />
+                  <button
+                    id="copyInviteBtn"
+                    className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700"
+                  >
+                    Sao chép
+                  </button>
+                </div>
+                <p className="text-gray-500 text-xs mt-2">
+                  Link mới của bạn sẽ hết hạn sau 7 ngày.{" "}
+                  <a href="#" className="text-blue-500 hover:underline">
+                    Chỉnh sửa link mới.
+                  </a>
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {showJoinRequestModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-gray-800 rounded-lg w-full max-w-2xl mx-4 shadow-lg h-[80vh] overflow-y-auto">
+              <div className="flex justify-end p-2">
+                <button
+                  onClick={() => setShowJoinRequestModal(false)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+              <div className="px-6 py-2 border-b border-gray-700">
+                <h2 className="text-white text-lg font-semibold">
+                  Join Requests
+                </h2>
+              </div>
+              <div className="px-6 py-4 space-y-4">
+                {isLoadingJoinRequests ? (
+                  <div className="text-gray-400 text-center py-4">
+                    Loading...
+                  </div>
+                ) : pendingRequests.length === 0 ? (
+                  <div className="text-gray-400 text-center py-4">
+                    No pending requests.
+                  </div>
+                ) : (
+                  pendingRequests.map((request) => (
+                    <div
+                      key={request.id}
+                      className="flex items-center justify-between"
+                    >
+                      <img
+                        src={request.avatar}
+                        alt={request.username}
+                        className="w-10 h-10 rounded-full mr-2"
+                      />
+                      <span className="text-white flex-1">
+                        {request.username}
+                      </span>
+                      <span className="text-gray-400 text-sm mr-2">
+                        Invited by {request.invitedBy}
+                      </span>
+                      <button
+                        onClick={() => handleApprove(request.id)}
+                        className="px-2 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 mr-2"
+                        disabled={isApproving}
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleReject(request.id)}
+                        className="px-2 py-1 bg-red-600 text-white rounded-md hover:bg-red-700"
+                        disabled={isRejecting}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="w-full h-auto">
           <div className="flex flex-row justify-between px-2">
@@ -306,8 +472,6 @@ function MessagesPage({ ...props }: ConversationProps) {
                   username={`@${userInfo.username}`}
                 />
               </div>
-
-              {/* Tim chat */}
               <input
                 type="text"
                 list="usernames"
@@ -320,7 +484,6 @@ function MessagesPage({ ...props }: ConversationProps) {
                 🔹 Nếu đăng nhập bằng Google, tên người dùng mặc định là email
                 của bạn.
               </p>
-
               <datalist id="usernames">
                 <option value="admin" />
                 <option value="admin1" />
@@ -333,14 +496,13 @@ function MessagesPage({ ...props }: ConversationProps) {
           <div className="font-bold px-4 pt-2">{autoCaplock("Channels")}</div>
         </div>
 
-        {/* A message is a conversation */}
         <div className="flex flex-col mx-3">
           {isLoading && <div>Loading...</div>}
           {error && <div>Error loading chats</div>}
-
-          {/* Text Channel Section */}
           <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
-            <div className="font-bold px-4 pt-2">{autoCaplock("Text channel")}</div>
+            <div className="font-bold px-4 pt-2">
+              {autoCaplock("Text channel")}
+            </div>
           </div>
           {textChannels.length === 0 && (
             <div className="h-full flex flex-col justify-center items-center">
@@ -359,10 +521,10 @@ function MessagesPage({ ...props }: ConversationProps) {
               messageItemData={message}
             />
           ))}
-
-          {/* Video Channel Section */}
           <div className="flex flex-row px-4 py-2 overflow-y-auto text-[#80848E]">
-            <div className="font-bold px-4 pt-2">{autoCaplock("Video channel")}</div>
+            <div className="font-bold px-4 pt-2">
+              {autoCaplock("Video channel")}
+            </div>
           </div>
           {videoChannels.length === 0 && (
             <div className="h-full flex flex-col justify-center items-center">
@@ -389,7 +551,6 @@ function MessagesPage({ ...props }: ConversationProps) {
                     fontWeight: 600,
                   }}
                 >
-                  {/* Icon loa */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="22"

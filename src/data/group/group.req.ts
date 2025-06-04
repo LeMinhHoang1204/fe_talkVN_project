@@ -1,20 +1,24 @@
 export type CreateGroupRequest = {
-    name: string;
-    isPrivate: boolean;
-    password: string;
-    description: string;
-    maxQuantity: number;
+  name: string;
+  isPrivate: boolean;
+  password: string;
+  description: string;
+  maxQuantity: number;
 };
 
 export type RequestJoinGroup = {
-    groupId: string;
-    invitationCode: string;
+  groupId: string;
+  invitationCode: string;
 };
 
 export type ApproveJoinGroupRequest = {
-    joinGroupRequestId: string;
+  joinGroupRequestId: string;
 };
 
 export type GetGroupRequest = {
-    groupId: string;
+  groupId: string;
+};
+
+export type JoinGroupRequestDto = {
+  groupId: string;
 };
